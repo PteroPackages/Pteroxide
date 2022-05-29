@@ -9,9 +9,6 @@ pub struct Account {
     pub last_name: String,
     pub language: String,
     pub admin: bool,
-    #[serde(skip_serializing)]
-    #[serde(skip_deserializing)]
-    pub api_keys: Option<Vec<ApiKey>>,
 }
 
 impl Account {

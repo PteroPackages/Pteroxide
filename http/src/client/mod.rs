@@ -6,7 +6,10 @@ use serde::de::Deserialize;
 
 use crate::{
     errors::Error,
-    requests::{account::GetAccount, RequestBuilder},
+    requests::{
+        account::{GetAccount, GetApiKeys},
+        RequestBuilder
+    },
 };
 
 #[derive(Debug)]
@@ -77,5 +80,9 @@ impl Client {
 
     pub fn get_account(&self) -> GetAccount {
         GetAccount::new(self)
+    }
+
+    pub fn get_api_keys(&self) -> GetApiKeys {
+        GetApiKeys::new(self)
     }
 }
