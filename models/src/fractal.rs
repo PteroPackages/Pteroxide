@@ -14,6 +14,8 @@ impl Display for FractalError {
     }
 }
 
+impl std::error::Error for FractalError {}
+
 impl FractalError {
     pub fn new(code: &str, status: &str, detail: &str) -> Self {
         Self {

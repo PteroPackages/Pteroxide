@@ -1,10 +1,12 @@
+use pteroxide_models::fractal::FractalError;
 use std::error;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Debug)]
 pub enum ErrorKind {
-    RequestError,
     FractalError,
+    RequestError,
+    UnknownError,
 }
 
 #[derive(Debug)]
@@ -13,11 +15,21 @@ pub struct Error {
     pub(super) kind: ErrorKind,
 }
 
+impl Default for Error {
+    fn default() -> Self {
+        Self {
+            kind: ErrorKind::UnknownError,
+            source: None,
+        }
+    }
+}
+
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self.kind {
             ErrorKind::RequestError => f.write_str("failed to perform request"),
             ErrorKind::FractalError => f.write_str("recieved an api error"),
+            ErrorKind::UnknownError => f.write_str("unknown error"),
         }
     }
 }
@@ -32,6 +44,15 @@ impl From<hyper::Error> for Error {
     fn from(error: hyper::Error) -> Self {
         Self {
             kind: ErrorKind::RequestError,
+            source: Some(Box::new(error)),
+        }
+    }
+}
+
+impl From<FractalError> for Error {
+    fn from(error: FractalError) -> Self {
+        Self {
+            kind: ErrorKind::FractalError,
             source: Some(Box::new(error)),
         }
     }
