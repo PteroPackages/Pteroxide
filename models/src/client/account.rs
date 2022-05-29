@@ -9,6 +9,9 @@ pub struct Account {
     pub last_name: String,
     pub language: String,
     pub admin: bool,
+    #[serde(skip_serializing)]
+    #[serde(skip_deserializing)]
+    pub api_keys: Option<Vec<ApiKey>>,
 }
 
 impl Account {
@@ -18,4 +21,13 @@ impl Account {
 
     // TODO: use md5
     // pub fn avatar(&self) -> String {}
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ApiKey {
+    pub identifier: String,
+    pub description: String,
+    pub allowed_ips: Vec<String>,
+    pub created_at: String,
+    pub last_used_at: Option<String>,
 }

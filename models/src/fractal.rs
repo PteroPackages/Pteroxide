@@ -41,7 +41,7 @@ impl<T> Display for FractalData<T> {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FractalList<T> {
     pub object: String,
-    pub data: Vec<T>,
+    pub data: Vec<FractalData<T>>,
 }
 
 impl<T> Display for FractalList<T> {
