@@ -43,9 +43,10 @@ impl Client {
             .header("Accept", "application/json,text/plain")
             .body(Body::from(builder.body))
             .unwrap();
-        println!("{:#?}", req);
+
         let res = self.http.request(req).await;
         println!("{:#?}", res);
+
         match res {
             Ok(v) => match v.status() {
                 StatusCode::OK | StatusCode::CREATED => {
