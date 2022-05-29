@@ -6,6 +6,7 @@ use hyper::{
     Uri,
     StatusCode,
 };
+use pteroxide_models::fractal::FractalError;
 use serde::de::Deserialize;
 
 use crate::errors::Error;
@@ -42,8 +43,7 @@ impl Client {
             .body(Body::from(builder.body))
             .unwrap();
 
-        let res = self.http.request(req).await;
-        match res {
+        match self.http.request(req).await {
             Ok(v) => match v.status() {
                 StatusCode::OK | StatusCode::CREATED => {
                     let buf = hyper::body::aggregate(v).await?;
@@ -51,7 +51,15 @@ impl Client {
                     Ok(Some(data))
                 },
                 StatusCode::ACCEPTED | StatusCode::NO_CONTENT => Ok(None),
-                _ => Ok(None),
+                StatusCode::BAD_REQUEST | StatusCode::UNAUTHORIZED | StatusCode::FORBIDDEN |
+                StatusCode::NOT_FOUND | StatusCode::METHOD_NOT_ALLOWED | StatusCode::CONFLICT |
+                StatusCode::UNPROCESSABLE_ENTITY | StatusCode::TOO_MANY_REQUESTS => {
+                    let buf = hyper::body::aggregate(v).await?;
+                    let data = serde_json::from_reader::<_, FractalError>(buf.reader()).unwrap();
+                    Err(Error::from(data))
+                },
+                // indeterminable
+                _ => Err(Error::default())
             },
             Err(e) => Err(Error::from(e)),
         }
