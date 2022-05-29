@@ -4,6 +4,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Debug)]
 pub enum ErrorKind {
+    FieldError,
     FractalError,
     RequestError,
     UnknownError,
@@ -27,8 +28,9 @@ impl Default for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self.kind {
-            ErrorKind::RequestError => f.write_str("failed to perform request"),
+            ErrorKind::FieldError => f.write_str("recieved a validation field error"),
             ErrorKind::FractalError => f.write_str("recieved an api error"),
+            ErrorKind::RequestError => f.write_str("failed to perform request"),
             ErrorKind::UnknownError => f.write_str("unknown error"),
         }
     }
@@ -54,6 +56,15 @@ impl From<FractalError> for Error {
         Self {
             kind: ErrorKind::FractalError,
             source: Some(Box::new(error)),
+        }
+    }
+}
+
+impl From<&str> for Error {
+    fn from(_: &str) -> Self {
+        Self {
+            kind: ErrorKind::FieldError,
+            source: None,
         }
     }
 }
