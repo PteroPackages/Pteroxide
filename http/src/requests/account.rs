@@ -175,3 +175,52 @@ impl<'a> CreateApiKey<'a> {
         }
     }
 }
+
+/// Deletes a specified API key from the account.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.delete_api_key("ATvnaMZwaQgoxplo")
+///         .exec()
+///         .await
+///         .expect("couldn't delete api key");
+/// }
+/// ```
+pub struct DeleteApiKey<'a> {
+    http: &'a Client,
+    id: String,
+}
+
+impl<'a> DeleteApiKey<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self { http, id }
+    }
+
+    /// Executes a request to delete a specified [`ApiKey`].
+    ///
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<(), Error> {
+        let mut req = RequestBuilder::new(
+            &format!("/api/client/account/api-keys/{}", self.id)
+        );
+        req.method("DELETE")?;
+
+        match self.http.request::<()>(req).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+}
