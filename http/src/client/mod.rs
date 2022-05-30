@@ -7,7 +7,7 @@ use serde::de::Deserialize;
 use crate::{
     errors::Error,
     requests::{
-        account::{GetAccount, GetApiKeys, CreateApiKey},
+        account::{CreateApiKey, GetAccount, GetApiKeys},
         RequestBuilder
     },
 };

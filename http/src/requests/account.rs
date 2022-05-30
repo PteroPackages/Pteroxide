@@ -1,12 +1,12 @@
-use crate::client::Client;
-use crate::errors::Error;
-use crate::requests::RequestBuilder;
-
 use pteroxide_models::{
     client::account::{Account, ApiKey},
     fractal::{FractalData, FractalList},
 };
 use serde_json::json;
+
+use crate::client::Client;
+use crate::errors::Error;
+use crate::requests::RequestBuilder;
 
 pub struct GetAccount<'a> {
     http: &'a Client,

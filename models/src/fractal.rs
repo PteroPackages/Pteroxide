@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ErrorData {
     pub code: String,
     pub status: String,
@@ -14,7 +14,7 @@ impl Display for ErrorData {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalError {
     pub errors: Vec<ErrorData>,
 }
@@ -35,7 +35,7 @@ impl Display for FractalError {
 impl std::error::Error for ErrorData {}
 impl std::error::Error for FractalError {}
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalData<T> {
     pub object: String,
     pub attributes: T,
@@ -47,7 +47,7 @@ impl<T> Display for FractalData<T> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalList<T> {
     pub object: String,
     pub data: Vec<FractalData<T>>,
