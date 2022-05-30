@@ -31,7 +31,7 @@ impl RequestBuilder {
     }
 
     pub fn json(&mut self, data: Value) {
-        let v = data.as_str().unwrap();
+        let v = data.as_str().unwrap_or_default();
         self.body = Body::from(v.to_owned());
     }
 

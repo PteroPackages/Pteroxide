@@ -7,7 +7,7 @@ use serde::de::Deserialize;
 use crate::{
     errors::Error,
     requests::{
-        account::{GetAccount, GetApiKeys},
+        account::{GetAccount, GetApiKeys, CreateApiKey},
         RequestBuilder
     },
 };
@@ -43,9 +43,10 @@ impl Client {
             .uri(uri)
             .header("User-Agent", "Pteroxide Client")
             .header("Authorization", format!("Bearer {}", self.key))
+            .header("Content-Type", "application/json")
             .header("Accept", "application/json,text/plain")
-            .body(Body::from(builder.body))
-            .unwrap();
+            .body(builder.body)
+            .unwrap_or_default();
 
         let res = self.http.request(req).await;
         println!("{:#?}", res);
@@ -84,5 +85,9 @@ impl Client {
 
     pub fn get_api_keys(&self) -> GetApiKeys {
         GetApiKeys::new(self)
+    }
+
+    pub fn create_api_key(&self) -> CreateApiKey {
+        CreateApiKey::new(self)
     }
 }
