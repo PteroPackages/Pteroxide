@@ -1,7 +1,7 @@
 //! Implementations for making requests for Accounts (Client API).
 
 use pteroxide_models::{
-    client::account::{Account, ApiKey},
+    client::account::{Account, ApiKey, TwoFactorWrapper},
     fractal::{FractalData, FractalList},
 };
 use serde_json::json;
@@ -220,6 +220,53 @@ impl<'a> DeleteApiKey<'a> {
 
         match self.http.request::<()>(req).await {
             Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+/// Gets a two-factor authentication code to setup 2FA for the account.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     let url = client.get_two_factor_code()
+///         .exec()
+///         .await
+///         .expect("couldn't get 2fa code");
+/// 
+///     println!("{:?}", url);
+/// }
+/// ```
+pub struct GetTwoFactorCode<'a> {
+    http: &'a Client,
+}
+
+impl<'a> GetTwoFactorCode<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client) -> Self {
+        Self { http }
+    }
+
+    /// Executes a request and returns the 2FA authentication code if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<String, Error> {
+        match self.http.request::<TwoFactorWrapper>(
+            RequestBuilder::new("/api/client/account/two-factor")
+        ).await {
+            Ok(v) => Ok(v.unwrap().data.image_url_data),
             Err(e) => Err(e),
         }
     }

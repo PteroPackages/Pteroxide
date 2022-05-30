@@ -28,3 +28,13 @@ pub struct ApiKey {
     pub created_at: String,
     pub last_used_at: Option<String>,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct TfaInner {
+    pub image_url_data: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TwoFactorWrapper {
+    pub data: TfaInner,
+}
