@@ -1,3 +1,5 @@
+//! Implementations for making requests for Accounts (Client API).
+
 use pteroxide_models::{
     client::account::{Account, ApiKey},
     fractal::{FractalData, FractalList},
@@ -13,10 +15,17 @@ pub struct GetAccount<'a> {
 }
 
 impl<'a> GetAccount<'a> {
+    #[doc(hidden)]
     pub fn new(http: &'a Client) -> Self {
         Self { http }
     }
 
+    /// Executes a request and returns the [`Account`] if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Account, Error> {
         match self.http.request::<FractalData<Account>>(
             RequestBuilder::new("/api/client/account")
@@ -27,15 +36,43 @@ impl<'a> GetAccount<'a> {
     }
 }
 
+/// Gets the API keys associated with the account.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.get_api_keys()
+///         .exec()
+///         .await
+///         .expect("couldn't get api keys")
+///         .iter()
+///         .for_each(|k| println!("{}", k.identifier));
+/// }
+/// ```
 pub struct GetApiKeys<'a> {
     http: &'a Client,
 }
 
 impl<'a> GetApiKeys<'a> {
+    #[doc(hidden)]
     pub fn new(http: &'a Client) -> Self {
         Self { http }
     }
 
+    /// Executes a request and returns a list of [`ApiKey`]s if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<ApiKey>, Error> {
         match self.http.request::<FractalList<ApiKey>>(
             RequestBuilder::new("/api/client/account/api-keys")
@@ -50,6 +87,29 @@ impl<'a> GetApiKeys<'a> {
     }
 }
 
+/// Create an API key for the account.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     let key = client.create_api_key()
+///         .description("my api key")
+///         .ip("172.18.0.1".to_string())
+///         .exec()
+///         .await
+///         .expect("couldn't create api key");
+/// 
+///     println!("{}", key.identifier);
+/// }
+/// ```
 pub struct CreateApiKey<'a> {
     http: &'a Client,
     description: String,
@@ -57,6 +117,7 @@ pub struct CreateApiKey<'a> {
 }
 
 impl<'a> CreateApiKey<'a> {
+    #[doc(hidden)]
     pub fn new(http: &'a Client) -> Self {
         Self {
             http,
@@ -65,24 +126,37 @@ impl<'a> CreateApiKey<'a> {
         }
     }
 
+    /// Sets the description of the API key.
+    /// 
+    /// **Note:** this is required and will throw an [`Error`] at execution if empty.
     pub fn description(mut self, description: String) -> Self {
         self.description = description;
 
         self
     }
 
+    /// Adds a single IP to be bound to the API key.
     pub fn ip(mut self, ip: String) -> Self {
         self.allowed_ips.push(ip);
 
         self
     }
 
+    /// Sets a list of IPs to be bound to the API key.
     pub fn ips(mut self, ips: Vec<String>) -> Self {
         self.allowed_ips = ips;
 
         self
     }
 
+    /// Executes a request and returns the new [`ApiKey`] if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`FieldError`] if the `description` is not set.
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`FieldError`]: crate::errors::ErrorKind::FieldError
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<ApiKey, Error> {
         if self.description.is_empty() {
             return Err(Error::from("api key description is required"));

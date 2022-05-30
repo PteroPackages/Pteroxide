@@ -1,3 +1,5 @@
+//! Implementations for requests to the Client API.
+
 use bytes::Buf;
 use hyper::{client::Client as HttpClient, Body, Request, StatusCode, Uri};
 use hyper_tls::HttpsConnector;
@@ -12,6 +14,27 @@ use crate::{
     },
 };
 
+/// The manager for interacting with the Pterodactyl Client API.
+/// 
+/// ## Examples
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     let acc = app.get_account()
+///         .exec()
+///         .await
+///         .expect("couldn't get the account");
+/// 
+///     println!("{:#?}", acc);
+/// }
+/// ```
 #[derive(Debug)]
 pub struct Client {
     pub url: String,
@@ -30,6 +53,12 @@ impl Client {
         }
     }
 
+    /// Performs a new request to the client API and returns the resulting [`Option<T>`].
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request fails.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn request<T>(&self, builder: RequestBuilder) -> Result<Option<T>, Error>
     where
         for<'de> T: Deserialize<'de>,
@@ -79,14 +108,17 @@ impl Client {
         }
     }
 
+    /// Returns a request builder for getting the account.
     pub fn get_account(&self) -> GetAccount {
         GetAccount::new(self)
     }
 
+    /// Returns a request builder for getting API keys.
     pub fn get_api_keys(&self) -> GetApiKeys {
         GetApiKeys::new(self)
     }
 
+    /// Returns a request builder for creating an API key.
     pub fn create_api_key(&self) -> CreateApiKey {
         CreateApiKey::new(self)
     }

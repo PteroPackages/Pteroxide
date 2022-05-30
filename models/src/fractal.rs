@@ -1,6 +1,12 @@
+//! The wrapper objects that encapsule the inner value of a HTTP response from the Pterodactyl API
+//! This can be either a response item [`FractalData`], a response list [`FractalList`], or a
+//! response error [`FractalError`].
+
 use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+/// The error object (received on non-2xx HTTP responses). It implements the default
+/// [`std::error::Error`] for compatibility.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ErrorData {
     pub code: String,
@@ -14,6 +20,8 @@ impl Display for ErrorData {
     }
 }
 
+/// Wrapper object that holds one or more [`ErrorData`] object. It implements the default
+/// [`std::error::Error`] for compatibility.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalError {
     pub errors: Vec<ErrorData>,
@@ -35,6 +43,7 @@ impl Display for FractalError {
 impl std::error::Error for ErrorData {}
 impl std::error::Error for FractalError {}
 
+/// The wrapper object for a single item from the Pterodactyl API.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalData<T> {
     pub object: String,
@@ -47,6 +56,8 @@ impl<T> Display for FractalData<T> {
     }
 }
 
+/// The wrapper object for an array of items from the Pterodactyl API. These items is often a list
+/// of [`FractalData`] wrapped objects.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct FractalList<T> {
     pub object: String,

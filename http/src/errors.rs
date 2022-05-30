@@ -1,7 +1,11 @@
+//! Error implementations for the module.
+
 use pteroxide_models::fractal::FractalError;
 use std::error;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+/// The kind of error that is being returned. This can vary depending on where in the module the
+/// error originated from.
 #[derive(Debug)]
 pub enum ErrorKind {
     FieldError,
@@ -10,6 +14,9 @@ pub enum ErrorKind {
     UnknownError,
 }
 
+/// Represents an error in the module. Because this can have different origins, [`ErrorKind`] is
+/// implemented to identify the kinds. It implements the default [`std::error::Error`] for
+/// compatibility.
 #[derive(Debug)]
 pub struct Error {
     pub(super) source: Option<Box<dyn error::Error + Send + Sync>>,
@@ -70,6 +77,7 @@ impl From<&str> for Error {
 }
 
 impl Error {
+    /// Returns the [`ErrorKind`] of the error.
     pub const fn kind(&self) -> &ErrorKind {
         &self.kind
     }
