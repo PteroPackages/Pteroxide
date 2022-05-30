@@ -54,8 +54,7 @@ impl RequestBuilder {
 
     /// Sets the request body's [`Value`] to a JSON object.
     pub fn json(&mut self, data: Value) {
-        let v = data.as_str().unwrap_or_default();
-        self.body = Body::from(v.to_owned());
+        self.body = Body::from(data.to_string());
     }
 
     /// Sets the request body's [`Value`] to a raw string.
