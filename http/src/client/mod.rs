@@ -9,7 +9,9 @@ use serde::de::Deserialize;
 use crate::{
     errors::Error,
     requests::{
-        account::{CreateApiKey, DeleteApiKey, GetAccount, GetApiKeys, GetTwoFactorCode},
+        account::{
+            CreateApiKey, DeleteApiKey, GetAccount, GetApiKeys, GetTwoFactorCode, UpdateAccount
+        },
         RequestBuilder
     },
 };
@@ -131,5 +133,10 @@ impl Client {
     /// Returns a request builder for getting a two-factor authentication code.
     pub fn get_two_factor_code(&self) -> GetTwoFactorCode {
         GetTwoFactorCode::new(self)
+    }
+
+    /// Returns a request builder for updating the account.
+    pub fn update_account(&self) -> UpdateAccount {
+        UpdateAccount::new(self)
     }
 }

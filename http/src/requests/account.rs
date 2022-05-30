@@ -271,3 +271,116 @@ impl<'a> GetTwoFactorCode<'a> {
         }
     }
 }
+
+/// Updates several fields on the account. This can be the email, password, or two-factor status.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.update_account()
+///         .email(
+///             "myEmail@example.com".to_string(),
+///             "my_password".to_string(),
+///         )
+///         .password(
+///             "old_password".to_string(),
+///             "newPassword".to_string(),
+///         )
+///         .unwrap()
+///         .exec()
+///         .await
+///         .expect("couldn't update account");
+/// }
+/// ```
+pub struct UpdateAccount<'a> {
+    http: &'a Client,
+    email: Option<(String, String)>,
+    password: Option<(String, String)>,
+}
+
+impl<'a> UpdateAccount<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client) -> Self {
+        Self {
+            http,
+            email: None,
+            password: None,
+        }
+    }
+
+    /// Sets the email to be updated on the account.
+    pub fn email(mut self, new: String, pass: String) -> Self {
+        self.email = Some((new, pass));
+
+        self
+    }
+
+    /// Sets the password to be updated on the account.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`FieldError`] if the new password is not unique.
+    /// 
+    /// [`FieldError`]: crate::errors::ErrorKind::FieldError
+    pub fn password(mut self, old: String, new: String) -> Result<Self, Error> {
+        if old == new {
+            return Err(Error::from("cannot update password with the same value"));
+        }
+        self.password = Some((old, new));
+
+        Ok(self)
+    }
+
+    /// Executes a request to update the email and/or password on the account.
+    ///
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`FieldError`] if either the update email field or
+    /// update password field is not specified.
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`FieldError`]: crate::errors::ErrorKind::FieldError
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.email.is_none() && self.password.is_none() {
+            return Err(Error::from("cannot update the account with no fields"));
+        }
+
+        if let Some(data) = self.email {
+            let mut req = RequestBuilder::new("/api/client/account/email");
+            req.method("PUT")?;
+            req.json(json!({
+                "email": data.0,
+                "password": data.1
+            }));
+
+            match self.http.request::<()>(req).await {
+                Ok(_) => (),
+                Err(e) => return Err(e),
+            }
+        }
+
+        if let Some(data) = self.password {
+            let mut req = RequestBuilder::new("/api/client/account/password");
+            req.method("PUT")?;
+            req.json(json!({
+                "current_password": data.0,
+                "password": data.1,
+                "password_confirmation": data.1
+            }));
+
+            match self.http.request::<()>(req).await {
+                Ok(_) => (),
+                Err(e) => return Err(e),
+            }
+        }
+
+        Ok(())
+    }
+}
