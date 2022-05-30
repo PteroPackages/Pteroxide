@@ -2,29 +2,38 @@ use serde::{Deserialize, Serialize};
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct FractalError {
+pub struct ErrorData {
     pub code: String,
     pub status: String,
     pub detail: String,
 }
 
-impl Display for FractalError {
+impl Display for ErrorData {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "code: {}; status: {}; detail: {}", self.code, self.status, self.detail)
     }
 }
 
-impl std::error::Error for FractalError {}
+#[derive(Debug, Deserialize, Serialize)]
+pub struct FractalError {
+    pub errors: Vec<ErrorData>,
+}
 
-impl FractalError {
-    pub fn new(code: &str, status: &str, detail: &str) -> Self {
-        Self {
-            code: code.to_string(),
-            status: status.to_string(),
-            detail: detail.to_string(),
+impl Display for FractalError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        for e in self.errors.iter() {
+            match Display::fmt(&e, f) {
+                Ok(_) => (),
+                Err(e) => return Err(e),
+            }
         }
+
+        Ok(())
     }
 }
+
+impl std::error::Error for ErrorData {}
+impl std::error::Error for FractalError {}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct FractalData<T> {
