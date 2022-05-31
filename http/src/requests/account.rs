@@ -1,7 +1,7 @@
 //! Implementations for making requests for Accounts (Client API).
 
 use pteroxide_models::{
-    client::account::{Account, ApiKey, TwoFactorWrapper},
+    client::account::{Account, ApiKey, TwoFactorTokenWrapper, TwoFactorWrapper},
     fractal::{FractalData, FractalList},
 };
 use serde_json::json;
@@ -272,7 +272,7 @@ impl<'a> GetTwoFactorCode<'a> {
     }
 }
 
-/// Updates several fields on the account. This can be the email, password, or two-factor status.
+/// Updates the email and/or password on the account.
 /// 
 /// ## Example
 /// ```no_run
@@ -382,5 +382,120 @@ impl<'a> UpdateAccount<'a> {
         }
 
         Ok(())
+    }
+}
+
+/// Updates the two-factor status of the account.
+/// 
+/// ## Examples
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.update_two_factor()
+///         .enable("94NH5IJEOM4G")
+///         .exec()
+///         .await
+///         .expect("couldn't enable two-factor auth")
+///         .iter()
+///         .for_each(|t| println!("{}", t));
+/// }
+/// ```
+/// 
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.update_two_factor()
+///         .disable("myPassword")
+///         .exec()
+///         .await
+///         .expect("couldn't disable two-factor auth");
+/// }
+/// ```
+pub struct UpdateTwoFactor<'a> {
+    http: &'a Client,
+    code: Option<String>,
+    password: Option<String>,
+}
+
+impl<'a> UpdateTwoFactor<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client) -> Self {
+        Self {
+            http,
+            code: None,
+            password: None,
+        }
+    }
+
+    /// Enables two-factor authentication on the account using the specified `code`.
+    pub fn enable(mut self, code: String) -> Self {
+        self.code = Some(code);
+
+        self
+    }
+
+    /// Disables two-factor authentication on the account using the `password`.
+    pub fn disable(mut self, pass: String) -> Self {
+        self.password = Some(pass);
+
+        self
+    }
+
+    /// Executes a request to update the two-factor status of the account. A list of two-factor
+    /// codes will be returned in an [`Option`] if enabled.
+    ///
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`FieldError`] if both the enable and disable fields
+    /// is specified.
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`FieldError`]: crate::errors::ErrorKind::FieldError
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<Option<Vec<String>>, Error> {
+        if self.code.is_some() && self.password.is_some() {
+            return Err(Error::from("cannot enable and disable two-factor at the same time"));
+        }
+
+        if let Some(data) = self.code {
+            let mut req = RequestBuilder::new("/api/client/account/two-factor");
+            req.method("POST")?;
+            req.json(json!({
+                "code": data
+            }));
+
+            return match self.http.request::<FractalData<TwoFactorTokenWrapper>>(req).await {
+                Ok(v) => Ok(Some(v.unwrap().attributes.tokens)),
+                Err(e) => Err(e),
+            }
+        }
+
+        if let Some(data) = self.password {
+            let mut req = RequestBuilder::new("/api/client/account/two-factor");
+            req.method("DELETE")?;
+            req.json(json!({
+                "password": data
+            }));
+
+            return match self.http.request::<()>(req).await {
+                Ok(_) => Ok(None),
+                Err(e) => Err(e),
+            }
+        }
+
+        Ok(None)
     }
 }

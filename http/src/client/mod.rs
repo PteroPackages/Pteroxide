@@ -10,9 +10,10 @@ use crate::{
     errors::Error,
     requests::{
         account::{
-            CreateApiKey, DeleteApiKey, GetAccount, GetApiKeys, GetTwoFactorCode, UpdateAccount
+            CreateApiKey, DeleteApiKey, GetAccount, GetApiKeys, GetTwoFactorCode, UpdateAccount,
+            UpdateTwoFactor,
         },
-        RequestBuilder
+        RequestBuilder,
     },
 };
 
@@ -138,5 +139,10 @@ impl Client {
     /// Returns a request builder for updating the account.
     pub fn update_account(&self) -> UpdateAccount {
         UpdateAccount::new(self)
+    }
+
+    /// Returns a request builder for updating the two-factor status.
+    pub fn update_two_factor(&self) -> UpdateTwoFactor {
+        UpdateTwoFactor::new(self)
     }
 }

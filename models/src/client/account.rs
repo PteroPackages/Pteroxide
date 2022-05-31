@@ -38,3 +38,8 @@ pub struct TfaInner {
 pub struct TwoFactorWrapper {
     pub data: TfaInner,
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct TwoFactorTokenWrapper {
+    pub tokens: Vec<String>,
+}
