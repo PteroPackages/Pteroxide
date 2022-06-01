@@ -32,12 +32,25 @@ use crate::{
 /// ```
 pub struct GetServers<'a> {
     http: &'a Client,
+    access: String,
 }
 
 impl<'a> GetServers<'a> {
     #[doc(hidden)]
     pub fn new(http: &'a Client) -> Self {
-        Self { http }
+        Self {
+            http,
+            access: String::from("admin"),
+        }
+    }
+
+    pub fn access(mut self, access: &str) -> Result<Self, Error> {
+        match access {
+            "admin" | "admin-all" | "owner" => self.access = String::from(access),
+            _ => return Err(Error::from("invalid access type")),
+        }
+
+        Ok(self)
     }
 
     /// Executes a request and returns a list of [`Server`]s if successful.
@@ -48,7 +61,7 @@ impl<'a> GetServers<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<Server>, Error> {
         match self.http.request::<FractalList<Server>>(
-            RequestBuilder::new("/api/client")
+            RequestBuilder::new(&format!("/api/client?type={}", self.access))
         ).await {
             Ok(v) => Ok(v.unwrap()
                 .data
