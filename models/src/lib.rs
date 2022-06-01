@@ -6,3 +6,4 @@
 
 pub mod client;
 pub mod fractal;
+pub mod global;
