@@ -14,6 +14,7 @@ use crate::{
             UpdateTwoFactor,
         },
         RequestBuilder,
+        server::GetServers,
     },
 };
 
@@ -144,5 +145,9 @@ impl Client {
     /// Returns a request builder for updating the two-factor status.
     pub fn update_two_factor(&self) -> UpdateTwoFactor {
         UpdateTwoFactor::new(self)
+    }
+
+    pub fn get_servers(&self) -> GetServers {
+        GetServers::new(self)
     }
 }

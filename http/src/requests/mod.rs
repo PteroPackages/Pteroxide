@@ -6,6 +6,7 @@ use serde_json::Value;
 use crate::errors::Error;
 
 pub mod account;
+pub mod server;
 
 /// The base builder for creating requests to Pterodactyl.
 /// 
