@@ -1,21 +1,28 @@
 //! Implementations for requests to the Client API.
 
+pub mod account;
+pub mod server;
+
 use bytes::Buf;
-use hyper::{client::Client as HttpClient, Body, Request, StatusCode, Uri};
+use hyper::{
+    Body,
+    client::{Client as HttpClient, HttpConnector},
+    Request, StatusCode, Uri,
+};
 use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::de::Deserialize;
 
 use crate::{
     errors::Error,
-    requests::{
-        account::{
-            CreateApiKey, DeleteApiKey, GetAccount, GetApiKeys, GetTwoFactorCode, UpdateAccount,
-            UpdateTwoFactor,
-        },
-        RequestBuilder,
-        server::GetServers,
+    requests::RequestBuilder,
+};
+use self::{
+    account::{
+        CreateApiKey, DeleteApiKey, GetApiKeys, GetAccount, GetTwoFactorCode, UpdateAccount,
+        UpdateTwoFactor,
     },
+    server::GetServers,
 };
 
 /// The manager for interacting with the Pterodactyl Client API.
@@ -43,7 +50,7 @@ use crate::{
 pub struct Client {
     pub url: String,
     pub key: String,
-    pub http: HttpClient<HttpsConnector<hyper::client::HttpConnector>>,
+    pub http: HttpClient<HttpsConnector<HttpConnector>>,
 }
 
 impl Client {
@@ -103,6 +110,7 @@ impl Client {
                     let buf = hyper::body::aggregate(v).await?;
                     let data = serde_json::from_reader::<_, FractalError>(buf.reader())
                         .expect("couldn't deserialize error");
+
                     Err(Error::from(data))
                 }
                 // indeterminable
