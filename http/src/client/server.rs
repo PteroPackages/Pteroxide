@@ -1,6 +1,6 @@
 use pteroxide_models::{
-    fractal::FractalList,
-    client::server::{Server, WebSocketAuth, WebSocketWrapper},
+    fractal::{FractalList, FractalData},
+    client::server::{Server, ServerStatistics, WebSocketAuth, WebSocketWrapper},
 };
 
 use crate::{
@@ -116,6 +116,27 @@ impl<'a> GetServerWebSocket<'a> {
             RequestBuilder::new(&format!("/api/client/servers/{}/websocket", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap().data),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+pub struct GetServerResources<'a> {
+    http: &'a Client,
+    id: String,
+}
+
+impl<'a> GetServerResources<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self { http, id }
+    }
+
+    pub async fn exec(self) -> Result<ServerStatistics, Error> {
+        match self.http.request::<FractalData<ServerStatistics>>(
+            RequestBuilder::new(&format!("/api/client/servers/{}/resources", self.id))
+        ).await {
+            Ok(v) => Ok(v.unwrap().attributes),
             Err(e) => Err(e),
         }
     }
