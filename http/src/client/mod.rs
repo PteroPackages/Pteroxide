@@ -22,7 +22,7 @@ use self::{
         CreateApiKey, DeleteApiKey, GetApiKeys, GetAccount, GetTwoFactorCode, UpdateAccount,
         UpdateTwoFactor,
     },
-    server::GetServers,
+    server::{GetServers, GetServerWebSocket},
 };
 
 /// The manager for interacting with the Pterodactyl Client API.
@@ -157,5 +157,9 @@ impl Client {
 
     pub fn get_servers(&self) -> GetServers {
         GetServers::new(self)
+    }
+
+    pub fn get_server_ws(&self, id: String) -> GetServerWebSocket {
+        GetServerWebSocket::new(self, id)
     }
 }

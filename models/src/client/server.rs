@@ -28,3 +28,14 @@ pub struct SftpDetails {
     pub ip: String,
     pub port: u64,
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct WebSocketAuth {
+    pub socket: String,
+    pub token: String,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct WebSocketWrapper {
+    pub data: WebSocketAuth,
+}

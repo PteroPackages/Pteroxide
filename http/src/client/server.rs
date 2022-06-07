@@ -1,6 +1,6 @@
 use pteroxide_models::{
     fractal::FractalList,
-    client::server::Server,
+    client::server::{Server, WebSocketAuth, WebSocketWrapper},
 };
 
 use crate::{
@@ -68,6 +68,54 @@ impl<'a> GetServers<'a> {
                 .iter()
                 .map(|k| k.attributes.clone())
                 .collect()),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+/// Gets the websocket authentication details for a specified server.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     let auth = client.get_server_ws("8d93a926".to_string())
+///         .exec()
+///         .await
+///         .expect("couldn't get server ws");
+/// 
+///     println!("{}\n{}", auth.socket, auth.token);
+/// }
+/// ```
+pub struct GetServerWebSocket<'a> {
+    http: &'a Client,
+    id: String,
+}
+
+impl<'a> GetServerWebSocket<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self { http, id }
+    }
+
+    /// Executes a request and returns the server's [`WebSocketAuth`] if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<WebSocketAuth, Error> {
+        match self.http.request::<WebSocketWrapper>(
+            RequestBuilder::new(&format!("/api/client/servers/{}/websocket", self.id))
+        ).await {
+            Ok(v) => Ok(v.unwrap().data),
             Err(e) => Err(e),
         }
     }
