@@ -22,7 +22,9 @@ use self::{
         CreateApiKey, DeleteApiKey, GetApiKeys, GetAccount, GetTwoFactorCode, UpdateAccount,
         UpdateTwoFactor,
     },
-    server::{GetServers, GetServerResources, GetServerWebSocket, SendServerCommand},
+    server::{
+        GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
+    },
 };
 
 /// The manager for interacting with the Pterodactyl Client API.
@@ -155,19 +157,28 @@ impl Client {
         UpdateTwoFactor::new(self)
     }
 
+    /// Returns a request builder for getting account servers.
     pub fn get_servers(&self) -> GetServers {
         GetServers::new(self)
     }
 
+    /// Returns a request builder for getting a server's websocket details.
     pub fn get_server_ws(&self, id: String) -> GetServerWebSocket {
         GetServerWebSocket::new(self, id)
     }
 
+    /// Returns a request builder for getting a server's resource utilization.
     pub fn get_server_resources(&self, id: String) -> GetServerResources {
         GetServerResources::new(self, id)
     }
 
+    /// Returns a request builder for sending a command to a server's console.
     pub fn send_server_command(&self, id: String) -> SendServerCommand {
         SendServerCommand::new(self, id)
+    }
+
+    /// Returns a request builder for setting the power state of a server.
+    pub fn set_power_state(&self, id: String) -> SetPowerState {
+        SetPowerState::new(self, id)
     }
 }

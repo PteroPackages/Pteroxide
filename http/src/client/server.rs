@@ -1,7 +1,9 @@
 use serde_json::json;
 use pteroxide_models::{
     fractal::{FractalList, FractalData},
-    client::server::{Server, ServerStatistics, WebSocketAuth, WebSocketWrapper},
+    client::server::{
+        PowerState, Server, ServerStatistics, WebSocketAuth, WebSocketWrapper,
+    },
 };
 
 use crate::{
@@ -230,6 +232,70 @@ impl<'a> SendServerCommand<'a> {
         req.method("POST")?;
         req.json(json!({
             "command": self.cmd
+        }));
+
+        match self.http.request::<()>(req).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+/// Sets the power state of a specified server. Defaults to `start` if `state()` is not specfiied.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// use pteroxide_models::client::server::PowerState;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.set_power_state("8d93a926".to_string())
+///         .state(PowerState::RESTART)
+///         .exec()
+///         .await
+///         .expect("couldn't set server power state");
+/// }
+/// ```
+pub struct SetPowerState<'a> {
+    http: &'a Client,
+    id: String,
+    state: PowerState,
+}
+
+impl<'a> SetPowerState<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            state: Default::default(),
+        }
+    }
+
+    /// The power state to set the server to.
+    pub fn state(mut self, state: PowerState) -> Self {
+        self.state = state;
+
+        self
+    }
+
+    /// Executes a request to set the server's power state.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<(), Error> {
+        let mut req = RequestBuilder::new(&format!("/api/client/servers/{}/power", self.id));
+        req.method("POST")?;
+        req.json(json!({
+            "signal": self.state.to_string()
         }));
 
         match self.http.request::<()>(req).await {
