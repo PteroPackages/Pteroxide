@@ -1,3 +1,4 @@
+use serde_json::json;
 use pteroxide_models::{
     fractal::{FractalList, FractalData},
     client::server::{Server, ServerStatistics, WebSocketAuth, WebSocketWrapper},
@@ -164,6 +165,75 @@ impl<'a> GetServerResources<'a> {
             RequestBuilder::new(&format!("/api/client/servers/{}/resources", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap().attributes),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+/// Sends a command to a specified server's console.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     client.send_server_command("8d93a926".to_string())
+///         .command("say hello rust!")
+///         .exec()
+///         .await
+///         .expect("couldn't send server command");
+/// }
+/// ```
+pub struct SendServerCommand<'a> {
+    http: &'a Client,
+    id: String,
+    cmd: String,
+}
+
+impl<'a> SendServerCommand<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            cmd: Default::default(),
+        }
+    }
+
+    /// Sets the command to be sent to the server.
+    pub fn command(mut self, cmd: String) -> Self {
+        self.cmd = cmd;
+
+        self
+    }
+
+    /// Executes a request to send a command to the server's console.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`FieldError`] if no command was specified.
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`FieldError`]: crate::errors::ErrorKind::FieldError
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.cmd.is_empty() {
+            return Err(Error::from("no command specified"));
+        }
+
+        let mut req = RequestBuilder::new(&format!("/api/client/servers/{}/command", self.id));
+        req.method("POST")?;
+        req.json(json!({
+            "command": self.cmd
+        }));
+
+        match self.http.request::<()>(req).await {
+            Ok(_) => Ok(()),
             Err(e) => Err(e),
         }
     }
