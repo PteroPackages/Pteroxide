@@ -2,6 +2,43 @@ use serde::{Deserialize, Serialize};
 
 use crate::global::{FeatureLimits, Limits};
 
+#[derive(Clone, Debug)]
+pub enum PowerState {
+    START,
+    STOP,
+    RESTART,
+    KILL,
+}
+
+impl Default for PowerState {
+    fn default() -> Self {
+        Self::START
+    }
+}
+
+impl From<&str> for PowerState {
+    fn from(s: &str) -> Self {
+        match s {
+            "start" => Self::START,
+            "stop" => Self::STOP,
+            "restart" => Self::RESTART,
+            "kill" => Self::KILL,
+            _ => Self::default(),
+        }
+    }
+}
+
+impl ToString for PowerState {
+    fn to_string(&self) -> String {
+        match *self {
+            Self::START => String::from("start"),
+            Self::STOP => String::from("stop"),
+            Self::RESTART => String::from("restart"),
+            Self::KILL => String::from("kill"),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Resources {
     pub memory_bytes: i64,
