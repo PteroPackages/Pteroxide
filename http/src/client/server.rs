@@ -121,6 +121,27 @@ impl<'a> GetServerWebSocket<'a> {
     }
 }
 
+/// Gets the server's current resource utilization.
+/// 
+/// ## Example
+/// ```no_run
+/// use pteroxide_http::client::Client;
+/// 
+/// #[tokio::main]
+/// async fn main() {
+///     let client = Client::new(
+///         "https://pterodactyl.domain".to_string(),
+///         "client_api_key".to_string(),
+///     );
+/// 
+///     let res = client.get_server_resources("8d93a926".to_string())
+///         .exec()
+///         .await
+///         .expect("couldn't get server resources");
+/// 
+///     println!("{:#?}", res);
+/// }
+/// ```
 pub struct GetServerResources<'a> {
     http: &'a Client,
     id: String,
@@ -132,6 +153,12 @@ impl<'a> GetServerResources<'a> {
         Self { http, id }
     }
 
+    /// Executes a request and returns the [`ServerStatistics`] if successful.
+    /// 
+    /// ## Errors
+    /// Returns an [`Error`] with the kind [`RequestError`] if the request failed to execute.
+    /// 
+    /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<ServerStatistics, Error> {
         match self.http.request::<FractalData<ServerStatistics>>(
             RequestBuilder::new(&format!("/api/client/servers/{}/resources", self.id))
