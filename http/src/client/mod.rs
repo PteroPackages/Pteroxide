@@ -23,7 +23,7 @@ use self::{
         CreateApiKey, DeleteApiKey, GetApiKeys, GetAccount, GetTwoFactorCode, UpdateAccount,
         UpdateTwoFactor,
     },
-    backup::GetBackups,
+    backup::{CreateBackup, GetBackups},
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -184,7 +184,13 @@ impl Client {
         SetPowerState::new(self, id)
     }
 
+    /// Returns a request builder for getting server backups.
     pub fn get_backups(&self, id: String) -> GetBackups {
         GetBackups::new(self, id)
+    }
+
+    /// Returns a request builder for creating a backup on a server.
+    pub fn create_backup(&self, id: String) -> CreateBackup {
+        CreateBackup::new(self, id)
     }
 }
