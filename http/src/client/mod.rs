@@ -1,6 +1,7 @@
 //! Implementations for requests to the Client API.
 
 pub mod account;
+pub mod backup;
 pub mod server;
 
 use bytes::Buf;
@@ -22,6 +23,7 @@ use self::{
         CreateApiKey, DeleteApiKey, GetApiKeys, GetAccount, GetTwoFactorCode, UpdateAccount,
         UpdateTwoFactor,
     },
+    backup::GetBackups,
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -180,5 +182,9 @@ impl Client {
     /// Returns a request builder for setting the power state of a server.
     pub fn set_power_state(&self, id: String) -> SetPowerState {
         SetPowerState::new(self, id)
+    }
+
+    pub fn get_backups(&self, id: String) -> GetBackups {
+        GetBackups::new(self, id)
     }
 }
