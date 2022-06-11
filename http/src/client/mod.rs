@@ -1,6 +1,7 @@
 pub mod account;
 pub mod backup;
 pub mod database;
+pub mod file;
 pub mod server;
 
 use bytes::Buf;
@@ -24,6 +25,7 @@ use self::{
     },
     backup::{CreateBackup, GetBackups},
     database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
+    file::GetFiles,
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -88,7 +90,7 @@ impl Client {
             .header("User-Agent", "Pteroxide Client")
             .header("Authorization", format!("Bearer {}", self.key))
             .header("Content-Type", "application/json")
-            .header("Accept", "application/json,text/plain")
+            .header("Accept", "application/json")
             .body(builder.body)
             .unwrap_or_default();
 
@@ -202,6 +204,10 @@ impl Client {
     /// Returns a request builder for deleting a database.
     pub fn delete_database(&self, id: String) -> DeleteDatabase {
         DeleteDatabase::new(self, id)
+    }
+
+    pub fn get_server_files(&self, id: String) -> GetFiles {
+        GetFiles::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.
