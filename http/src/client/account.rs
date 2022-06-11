@@ -1,5 +1,3 @@
-//! Implementations for making requests for Accounts (Client API).
-
 use pteroxide_models::{
     client::account::{Account, ApiKey, TwoFactorTokenWrapper, TwoFactorWrapper},
     fractal::{FractalData, FractalList},

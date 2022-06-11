@@ -1,7 +1,6 @@
-//! Implementations for requests to the Client API.
-
 pub mod account;
 pub mod backup;
+pub mod database;
 pub mod server;
 
 use bytes::Buf;
@@ -24,6 +23,7 @@ use self::{
         UpdateTwoFactor,
     },
     backup::{CreateBackup, GetBackups},
+    database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -182,6 +182,26 @@ impl Client {
     /// Returns a request builder for setting the power state of a server.
     pub fn set_power_state(&self, id: String) -> SetPowerState {
         SetPowerState::new(self, id)
+    }
+
+    /// Returns a request builder for getting server databases.
+    pub fn get_databases(&self, id: String) -> GetDatabases {
+        GetDatabases::new(self, id)
+    }
+
+    /// Returns a request builder for creating a database.
+    pub fn create_database(&self, id: String) -> CreateDatabase {
+        CreateDatabase::new(self, id)
+    }
+
+    /// Returns a request builder for rotating the password of a database.
+    pub fn rotate_db_password(&self, id: String) -> RotateDatabasePassword {
+        RotateDatabasePassword::new(self, id)
+    }
+
+    /// Returns a request builder for deleting a database.
+    pub fn delete_database(&self, id: String) -> DeleteDatabase {
+        DeleteDatabase::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.
