@@ -6,8 +6,9 @@ pub mod server;
 
 use bytes::Buf;
 use hyper::{
-    body::{aggregate, Body},
+    body::{self, Body},
     client::{Client as HttpClient, HttpConnector},
+    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
     Request, Uri,
 };
 use hyper_tls::HttpsConnector;
@@ -25,7 +26,7 @@ use self::{
     },
     backup::{CreateBackup, GetBackups},
     database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
-    file::GetFiles,
+    file::{GetFileContents, GetFiles},
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -87,10 +88,10 @@ impl Client {
         let req = Request::builder()
             .method(builder.method)
             .uri(uri)
-            .header("User-Agent", "Pteroxide Client")
-            .header("Authorization", format!("Bearer {}", self.key))
-            .header("Content-Type", builder.ctype.clone())
-            .header("Accept", builder.ctype.clone())
+            .header(USER_AGENT, "Pteroxide Client")
+            .header(AUTHORIZATION, format!("Bearer {}", self.key))
+            .header(CONTENT_TYPE, builder.ctype.clone())
+            .header(ACCEPT, builder.ctype.clone())
             .body(builder.body)
             .unwrap();
 
@@ -100,7 +101,7 @@ impl Client {
         match res {
             Ok(v) => match v.status().as_u16() {
                 200 | 201 => {
-                    let buf = aggregate(v).await?;
+                    let buf = body::aggregate(v).await?;
                     let data = serde_json::from_reader(buf.reader())
                         .expect("failed to serialize data");
 
@@ -108,7 +109,47 @@ impl Client {
                 }
                 202 | 204 => Ok(None),
                 400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
-                    let buf = aggregate(v).await?;
+                    let buf = body::aggregate(v).await?;
+                    let data = serde_json::from_reader::<_, FractalError>(buf.reader())
+                        .expect("failed to serialize error");
+
+                    Err(Error::from(data))
+                }
+                _ => Err(Error::default()),
+            }
+            Err(e) => Err(Error::from(e)),
+        }
+    }
+
+    pub async fn request_raw(&self,  builder: Builder) -> Result<Option<String>, Error> {
+        let uri = &format!("{}{}", self.url, builder.path)
+            .parse::<Uri>()
+            .unwrap();
+
+        let req = Request::builder()
+            .method(builder.method)
+            .uri(uri)
+            .header(USER_AGENT, "Pteroxide Client")
+            .header(AUTHORIZATION, format!("Bearer {}", self.key))
+            .header(CONTENT_TYPE, builder.ctype.clone())
+            .header(ACCEPT, builder.ctype.clone())
+            .body(builder.body)
+            .unwrap();
+
+        let res = self.http.request(req).await;
+        println!("{:#?}", res);
+
+        match res {
+            Ok(v) => match v.status().as_u16() {
+                200 | 201 => {
+                    let buf = hyper::body::to_bytes(v).await?;
+                    let data = String::from_utf8(buf.to_vec()).unwrap();
+
+                    Ok(Some(data))
+                }
+                202 | 204 => Ok(None),
+                400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
+                    let buf = body::aggregate(v).await?;
                     let data = serde_json::from_reader::<_, FractalError>(buf.reader())
                         .expect("failed to serialize error");
 
@@ -176,7 +217,7 @@ impl Client {
     }
 
     /// Returns a request builder for setting the power state of a server.
-    pub fn set_power_state(&self, id: String) -> SetPowerState {
+    pub fn set_server_power(&self, id: String) -> SetPowerState {
         SetPowerState::new(self, id)
     }
 
@@ -202,6 +243,10 @@ impl Client {
 
     pub fn get_server_files(&self, id: String) -> GetFiles {
         GetFiles::new(self, id)
+    }
+
+    pub fn get_file_contents(&self, id: String) -> GetFileContents {
+        GetFileContents::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.
