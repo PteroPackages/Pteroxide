@@ -4,9 +4,11 @@ use pteroxide_models::{
 };
 use serde_json::json;
 
-use crate::client::Client;
-use crate::errors::Error;
-use crate::requests::RequestBuilder;
+use crate::{
+    client::Client,
+    errors::Error,
+    request::Builder,
+};
 
 pub struct GetAccount<'a> {
     http: &'a Client,
@@ -26,7 +28,7 @@ impl<'a> GetAccount<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Account, Error> {
         match self.http.request::<FractalData<Account>>(
-            RequestBuilder::new("/api/client/account")
+            Builder::new("/api/client/account")
         ).await {
             Ok(v) => Ok(v.unwrap().attributes),
             Err(e) => Err(e),
@@ -73,7 +75,7 @@ impl<'a> GetApiKeys<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<ApiKey>, Error> {
         match self.http.request::<FractalList<ApiKey>>(
-            RequestBuilder::new("/api/client/account/api-keys")
+            Builder::new("/api/client/account/api-keys")
         ).await {
             Ok(v) => Ok(v.unwrap()
                 .data
@@ -160,12 +162,12 @@ impl<'a> CreateApiKey<'a> {
             return Err(Error::from("api key description is required"));
         }
 
-        let mut req = RequestBuilder::new("/api/client/account/api-keys");
-        req.method("POST")?;
-        req.json(json!({
+        let req = Builder::new("/api/client/account/api-keys")
+            .method("POST")?
+            .body(json!({
             "description": self.description,
             "allowed_ips": self.allowed_ips
-        }));
+            }));
 
         match self.http.request::<FractalData<ApiKey>>(req).await {
             Ok(v) => Ok(v.unwrap().attributes),
@@ -211,10 +213,9 @@ impl<'a> DeleteApiKey<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<(), Error> {
-        let mut req = RequestBuilder::new(
+        let req = Builder::new(
             &format!("/api/client/account/api-keys/{}", self.id)
-        );
-        req.method("DELETE")?;
+        ).method("DELETE")?;
 
         match self.http.request::<()>(req).await {
             Ok(_) => Ok(()),
@@ -262,7 +263,7 @@ impl<'a> GetTwoFactorCode<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<String, Error> {
         match self.http.request::<TwoFactorWrapper>(
-            RequestBuilder::new("/api/client/account/two-factor")
+            Builder::new("/api/client/account/two-factor")
         ).await {
             Ok(v) => Ok(v.unwrap().data.image_url_data),
             Err(e) => Err(e),
@@ -351,12 +352,12 @@ impl<'a> UpdateAccount<'a> {
         }
 
         if let Some(data) = self.email {
-            let mut req = RequestBuilder::new("/api/client/account/email");
-            req.method("PUT")?;
-            req.json(json!({
-                "email": data.0,
-                "password": data.1
-            }));
+            let req = Builder::new("/api/client/account/email")
+                .method("PUT")?
+                .body(json!({
+                    "email": data.0,
+                    "password": data.1
+                }));
 
             match self.http.request::<()>(req).await {
                 Ok(_) => (),
@@ -365,13 +366,13 @@ impl<'a> UpdateAccount<'a> {
         }
 
         if let Some(data) = self.password {
-            let mut req = RequestBuilder::new("/api/client/account/password");
-            req.method("PUT")?;
-            req.json(json!({
-                "current_password": data.0,
-                "password": data.1,
-                "password_confirmation": data.1
-            }));
+            let req = Builder::new("/api/client/account/password")
+                .method("PUT")?
+                .body(json!({
+                    "current_password": data.0,
+                    "password": data.1,
+                    "password_confirmation": data.1
+                }));
 
             match self.http.request::<()>(req).await {
                 Ok(_) => (),
@@ -469,11 +470,11 @@ impl<'a> UpdateTwoFactor<'a> {
         }
 
         if let Some(data) = self.code {
-            let mut req = RequestBuilder::new("/api/client/account/two-factor");
-            req.method("POST")?;
-            req.json(json!({
-                "code": data
-            }));
+            let req = Builder::new("/api/client/account/two-factor")
+                .method("POST")?
+                .body(json!({
+                    "code": data
+                }));
 
             return match self.http.request::<FractalData<TwoFactorTokenWrapper>>(req).await {
                 Ok(v) => Ok(Some(v.unwrap().attributes.tokens)),
@@ -482,11 +483,11 @@ impl<'a> UpdateTwoFactor<'a> {
         }
 
         if let Some(data) = self.password {
-            let mut req = RequestBuilder::new("/api/client/account/two-factor");
-            req.method("DELETE")?;
-            req.json(json!({
-                "password": data
-            }));
+            let req = Builder::new("/api/client/account/two-factor")
+                .method("DELETE")?
+                .body(json!({
+                    "password": data
+                }));
 
             return match self.http.request::<()>(req).await {
                 Ok(_) => Ok(None),

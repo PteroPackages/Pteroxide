@@ -1,5 +1,3 @@
-//! Error implementations for the module.
-
 use pteroxide_models::fractal::FractalError;
 use std::error;
 use std::fmt::{Display, Formatter, Result as FmtResult};

@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::{
     client::Client,
     errors::Error,
-    requests::RequestBuilder,
+    request::Builder,
 };
 
 pub struct GetDatabases<'a> {
@@ -23,7 +23,7 @@ impl<'a> GetDatabases<'a> {
 
     pub async fn exec(self) -> Result<Vec<Database>, Error> {
         match self.http.request::<FractalList<Database>>(
-            RequestBuilder::new(&format!("/api/client/servers/{}/databases", self.id))
+            Builder::new(&format!("/api/client/servers/{}/databases", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap()
                 .data
@@ -70,14 +70,12 @@ impl<'a> CreateDatabase<'a> {
             return Err(Error::from("database and remote fields are required"));
         }
 
-        let mut req = RequestBuilder::new(
-            &format!("/api/client/servers/{}/databases", self.id)
-        );
-        req.method("POST")?;
-        req.json(json!({
-            "database": self.database,
-            "remote": self.remote
-        }));
+        let req = Builder::new(&format!("/api/client/servers/{}/databases", self.id))
+            .method("POST")?
+            .body(json!({
+                "database": self.database,
+                "remote": self.remote
+            }));
 
         match self.http.request::<FractalData<Database>>(req).await {
             Ok(v) => Ok(v.unwrap().attributes),
@@ -113,10 +111,9 @@ impl<'a> RotateDatabasePassword<'a> {
             return Err(Error::from("database id is required"));
         }
 
-        let mut req = RequestBuilder::new(
+        let req = Builder::new(
             &format!("/api/client/servers/{}/database/{}/rotate-password", self.id, self.uid)
-        );
-        req.method("POST")?;
+        ).method("POST")?;
 
         match self.http.request::<FractalData<Database>>(req).await {
             Ok(v) => Ok(v.unwrap().attributes),
@@ -152,10 +149,9 @@ impl<'a> DeleteDatabase<'a> {
             return Err(Error::from("database id is required"));
         }
 
-        let mut req = RequestBuilder::new(
+        let req = Builder::new(
             &format!("/api/client/servers/{}/databases/{}", self.id, self.uid)
-        );
-        req.method("DELETE")?;
+        ).method("DELETE")?;
 
         match self.http.request::<()>(req).await {
             Ok(_) => Ok(()),

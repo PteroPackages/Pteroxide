@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::{
     client::Client,
     errors::Error,
-    requests::RequestBuilder,
+    request::Builder,
 };
 
 /// Gets a list of backups on a specific server.
@@ -50,7 +50,7 @@ impl<'a> GetBackups<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<Backup>, Error> {
         match self.http.request::<FractalList<Backup>>(
-            RequestBuilder::new(&format!("/api/client/servers/{}/backups", self.id))
+            Builder::new(&format!("/api/client/servers/{}/backups", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap()
                 .data
@@ -133,11 +133,11 @@ impl<'a> CreateBackup<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Backup, Error> {
-        let mut req = RequestBuilder::new(&format!("/api/client/servers/{}/backups", self.id));
-        req.method("POST")?;
+        let mut req = Builder::new(&format!("/api/client/servers/{}/backups", self.id))
+            .method("POST")?;
 
         if self.name.is_some() || self.is_locked.is_some() || self.ignored.is_some() {
-            req.json(json!({
+            req = req.body(json!({
                 "name": self.name,
                 "is_locked": self.is_locked,
                 "ignored": self.ignored

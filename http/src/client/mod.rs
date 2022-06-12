@@ -6,9 +6,9 @@ pub mod server;
 
 use bytes::Buf;
 use hyper::{
-    Body,
+    body::{aggregate, Body},
     client::{Client as HttpClient, HttpConnector},
-    Request, StatusCode, Uri,
+    Request, Uri,
 };
 use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
@@ -16,7 +16,7 @@ use serde::de::Deserialize;
 
 use crate::{
     errors::Error,
-    requests::RequestBuilder,
+    request::Builder,
 };
 use self::{
     account::{
@@ -76,11 +76,11 @@ impl Client {
     /// Returns an [`Error`] with the kind [`RequestError`] if the request fails.
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
-    pub async fn request<T>(&self, builder: RequestBuilder) -> Result<Option<T>, Error>
+    pub async fn request<T>(&self, builder: Builder) -> Result<Option<T>, Error>
     where
-        for<'de> T: Deserialize<'de>,
+        for<'de> T: Deserialize<'de>
     {
-        let uri = format!("{}{}", self.url, builder.path)
+        let uri = &format!("{}{}", self.url, builder.path)
             .parse::<Uri>()
             .unwrap();
 
@@ -89,39 +89,33 @@ impl Client {
             .uri(uri)
             .header("User-Agent", "Pteroxide Client")
             .header("Authorization", format!("Bearer {}", self.key))
-            .header("Content-Type", "application/json")
-            .header("Accept", "application/json")
+            .header("Content-Type", builder.ctype.clone())
+            .header("Accept", builder.ctype.clone())
             .body(builder.body)
-            .unwrap_or_default();
+            .unwrap();
 
         let res = self.http.request(req).await;
         println!("{:#?}", res);
 
         match res {
-            Ok(v) => match v.status() {
-                StatusCode::OK | StatusCode::CREATED => {
-                    let buf = hyper::body::aggregate(v).await?;
-                    let data = serde_json::from_reader::<_, T>(buf.reader()).unwrap();
+            Ok(v) => match v.status().as_u16() {
+                200 | 201 => {
+                    let buf = aggregate(v).await?;
+                    let data = serde_json::from_reader(buf.reader())
+                        .expect("failed to serialize data");
+
                     Ok(Some(data))
                 }
-                StatusCode::ACCEPTED | StatusCode::NO_CONTENT => Ok(None),
-                StatusCode::BAD_REQUEST
-                | StatusCode::UNAUTHORIZED
-                | StatusCode::FORBIDDEN
-                | StatusCode::NOT_FOUND
-                | StatusCode::METHOD_NOT_ALLOWED
-                | StatusCode::CONFLICT
-                | StatusCode::UNPROCESSABLE_ENTITY
-                | StatusCode::TOO_MANY_REQUESTS => {
-                    let buf = hyper::body::aggregate(v).await?;
+                202 | 204 => Ok(None),
+                400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
+                    let buf = aggregate(v).await?;
                     let data = serde_json::from_reader::<_, FractalError>(buf.reader())
-                        .expect("couldn't deserialize error");
+                        .expect("failed to serialize error");
 
                     Err(Error::from(data))
                 }
-                // indeterminable
                 _ => Err(Error::default()),
-            },
+            }
             Err(e) => Err(Error::from(e)),
         }
     }

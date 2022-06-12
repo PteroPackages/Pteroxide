@@ -1,15 +1,15 @@
-use serde_json::json;
 use pteroxide_models::{
     fractal::{FractalList, FractalData},
     client::server::{
         PowerState, Server, ServerStatistics, WebSocketAuth, WebSocketWrapper,
     },
 };
+use serde_json::json;
 
 use crate::{
     client::Client,
     errors::Error,
-    requests::RequestBuilder,
+    request::Builder,
 };
 
 /// Gets a list of servers associated with the account.
@@ -64,7 +64,7 @@ impl<'a> GetServers<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<Server>, Error> {
         match self.http.request::<FractalList<Server>>(
-            RequestBuilder::new(&format!("/api/client?type={}", self.access))
+            Builder::new(&format!("/api/client?type={}", self.access))
         ).await {
             Ok(v) => Ok(v.unwrap()
                 .data
@@ -116,7 +116,7 @@ impl<'a> GetServerWebSocket<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<WebSocketAuth, Error> {
         match self.http.request::<WebSocketWrapper>(
-            RequestBuilder::new(&format!("/api/client/servers/{}/websocket", self.id))
+            Builder::new(&format!("/api/client/servers/{}/websocket", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap().data),
             Err(e) => Err(e),
@@ -164,7 +164,7 @@ impl<'a> GetServerResources<'a> {
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<ServerStatistics, Error> {
         match self.http.request::<FractalData<ServerStatistics>>(
-            RequestBuilder::new(&format!("/api/client/servers/{}/resources", self.id))
+            Builder::new(&format!("/api/client/servers/{}/resources", self.id))
         ).await {
             Ok(v) => Ok(v.unwrap().attributes),
             Err(e) => Err(e),
@@ -228,11 +228,11 @@ impl<'a> SendServerCommand<'a> {
             return Err(Error::from("no command specified"));
         }
 
-        let mut req = RequestBuilder::new(&format!("/api/client/servers/{}/command", self.id));
-        req.method("POST")?;
-        req.json(json!({
-            "command": self.cmd
-        }));
+        let req = Builder::new(&format!("/api/client/servers/{}/command", self.id))
+            .method("POST")?
+            .body(json!({
+                "command": self.cmd
+            }));
 
         match self.http.request::<()>(req).await {
             Ok(_) => Ok(()),
@@ -292,11 +292,11 @@ impl<'a> SetPowerState<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<(), Error> {
-        let mut req = RequestBuilder::new(&format!("/api/client/servers/{}/power", self.id));
-        req.method("POST")?;
-        req.json(json!({
-            "signal": self.state.to_string()
-        }));
+        let req = Builder::new(&format!("/api/client/servers/{}/power", self.id))
+            .method("POST")?
+            .body(json!({
+                "signal": self.state.to_string()
+            }));
 
         match self.http.request::<()>(req).await {
             Ok(_) => Ok(()),

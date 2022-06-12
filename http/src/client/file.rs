@@ -2,12 +2,11 @@ use pteroxide_models::{
     fractal::FractalList,
     client::file::File,
 };
-// use serde_json::json;
 
 use crate::{
     client::Client,
     errors::Error,
-    requests::RequestBuilder,
+    request::Builder,
 };
 
 pub struct GetFiles<'a> {
@@ -34,7 +33,7 @@ impl<'a> GetFiles<'a> {
 
     pub async fn exec(self) -> Result<Vec<File>, Error> {
         match self.http.request::<FractalList<File>>(
-            RequestBuilder::new(
+            Builder::new(
                 &format!("/api/client/servers/{}/files/list?directory={}", self.id, self.dir)
             )
         ).await {
