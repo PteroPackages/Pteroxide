@@ -47,25 +47,40 @@ impl<'a> GetFiles<'a> {
     }
 }
 
-// pub struct GetFileContents<'a> {
-//     http: &'a Client,
-//     id: String,
-//     name: String,
-// }
+pub struct GetFileContents<'a> {
+    http: &'a Client,
+    id: String,
+    name: String,
+}
 
-// impl<'a> GetFileContents<'a> {
-//     #[doc(hidden)]
-//     pub fn new(http: &'a Client, id: String) -> Self {
-//         Self {
-//             http,
-//             id,
-//             name: Default::default(),
-//         }
-//     }
+impl<'a> GetFileContents<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            name: Default::default(),
+        }
+    }
 
-//     pub fn name(mut self, name: String) -> Self {
-//         self.name = name;
+    pub fn name(mut self, name: String) -> Self {
+        self.name = name;
 
-//         self
-//     }
-// }
+        self
+    }
+
+    pub async fn exec(self) -> Result<String, Error> {
+        if self.name.len() == 0 {
+            return Err(Error::from("file name is required"));
+        }
+
+        let req = Builder::new(
+            &format!("/api/client/servers/{}/files/contents?file={}", self.id, self.name)
+        ).content_type("text/plain");
+
+        match self.http.request_raw(req).await {
+            Ok(v) => Ok(v.unwrap()),
+            Err(e) => Err(e),
+        }
+    }
+}
