@@ -19,3 +19,8 @@ pub struct Limits {
     pub threads: Option<String>,
     pub oom_disabled: bool,
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct UrlData {
+    pub url: String,
+}

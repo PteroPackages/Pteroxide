@@ -26,7 +26,7 @@ use self::{
     },
     backup::{CreateBackup, GetBackups},
     database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
-    file::{GetFileContents, GetFiles},
+    file::{DownloadFile, GetFileContents, GetFiles},
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -247,6 +247,10 @@ impl Client {
 
     pub fn get_file_contents(&self, id: String) -> GetFileContents {
         GetFileContents::new(self, id)
+    }
+
+    pub fn get_file_download(&self, id: String) -> DownloadFile {
+        DownloadFile::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.
