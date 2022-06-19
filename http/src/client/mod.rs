@@ -81,9 +81,7 @@ impl Client {
     where
         for<'de> T: Deserialize<'de>
     {
-        let uri = &format!("{}{}", self.url, builder.path)
-            .parse::<Uri>()
-            .unwrap();
+        let uri = &format!("{}{}", self.url, builder.path).parse::<Uri>()?;
 
         let req = Request::builder()
             .method(builder.method)
@@ -92,39 +90,33 @@ impl Client {
             .header(AUTHORIZATION, format!("Bearer {}", self.key))
             .header(CONTENT_TYPE, builder.ctype.clone())
             .header(ACCEPT, builder.ctype.clone())
-            .body(builder.body)
-            .unwrap();
+            .body(builder.body)?;
 
-        let res = self.http.request(req).await;
+        let res = self.http.request(req).await?;
         println!("{:#?}", res);
 
-        match res {
-            Ok(v) => match v.status().as_u16() {
-                200 | 201 => {
-                    let buf = body::aggregate(v).await?;
-                    let data = serde_json::from_reader(buf.reader())
-                        .expect("failed to serialize data");
+        match res.status().as_u16() {
+            200 | 201 => {
+                let buf = body::aggregate(res).await?;
+                let data = serde_json::from_reader(buf.reader())
+                    .expect("failed to serialize data");
 
-                    Ok(Some(data))
-                }
-                202 | 204 => Ok(None),
-                400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
-                    let buf = body::aggregate(v).await?;
-                    let data = serde_json::from_reader::<_, FractalError>(buf.reader())
-                        .expect("failed to serialize error");
-
-                    Err(Error::from(data))
-                }
-                _ => Err(Error::default()),
+                Ok(Some(data))
             }
-            Err(e) => Err(Error::from(e)),
+            202 | 204 => Ok(None),
+            400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
+                let buf = body::aggregate(res).await?;
+                let data = serde_json::from_reader::<_, FractalError>(buf.reader())
+                    .expect("failed to serialize error");
+
+                Err(Error::from(data))
+            }
+            _ => Err(Error::default()),
         }
     }
 
     pub async fn request_raw(&self,  builder: Builder) -> Result<Option<String>, Error> {
-        let uri = &format!("{}{}", self.url, builder.path)
-            .parse::<Uri>()
-            .unwrap();
+        let uri = &format!("{}{}", self.url, builder.path).parse::<Uri>()?;
 
         let req = Request::builder()
             .method(builder.method)
@@ -133,31 +125,27 @@ impl Client {
             .header(AUTHORIZATION, format!("Bearer {}", self.key))
             .header(CONTENT_TYPE, builder.ctype.clone())
             .header(ACCEPT, builder.ctype.clone())
-            .body(builder.body)
-            .unwrap();
+            .body(builder.body)?;
 
-        let res = self.http.request(req).await;
+        let res = self.http.request(req).await?;
         println!("{:#?}", res);
 
-        match res {
-            Ok(v) => match v.status().as_u16() {
-                200 | 201 => {
-                    let buf = hyper::body::to_bytes(v).await?;
-                    let data = String::from_utf8(buf.to_vec()).unwrap();
+        match res.status().as_u16() {
+            200 | 201 => {
+                let buf = hyper::body::to_bytes(res).await?;
+                let data = String::from_utf8(buf.to_vec()).unwrap();
 
-                    Ok(Some(data))
-                }
-                202 | 204 => Ok(None),
-                400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
-                    let buf = body::aggregate(v).await?;
-                    let data = serde_json::from_reader::<_, FractalError>(buf.reader())
-                        .expect("failed to serialize error");
-
-                    Err(Error::from(data))
-                }
-                _ => Err(Error::default()),
+                Ok(Some(data))
             }
-            Err(e) => Err(Error::from(e)),
+            202 | 204 => Ok(None),
+            400 | 401 | 403 | 404 | 405 | 409 | 422 | 429 => {
+                let buf = body::aggregate(res).await?;
+                let data = serde_json::from_reader::<_, FractalError>(buf.reader())
+                    .expect("failed to serialize error");
+
+                Err(Error::from(data))
+            }
+            _ => Err(Error::default()),
         }
     }
 

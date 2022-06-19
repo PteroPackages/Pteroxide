@@ -6,7 +6,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 /// error originated from.
 #[derive(Debug)]
 pub enum ErrorKind {
-    FieldError,
+    FieldError { msg: &'static str },
     FractalError,
     RequestError,
     UnknownError,
@@ -33,7 +33,10 @@ impl Default for Error {
 impl Display for Error {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self.kind {
-            ErrorKind::FieldError => f.write_str("recieved a validation field error"),
+            ErrorKind::FieldError { msg } => {
+                f.write_str("validation requirement failed: ")?;
+                f.write_str(msg)
+            }
             ErrorKind::FractalError => f.write_str("recieved an api error"),
             ErrorKind::RequestError => f.write_str("failed to perform request"),
             ErrorKind::UnknownError => f.write_str("unknown error"),
@@ -47,15 +50,6 @@ impl error::Error for Error {
     }
 }
 
-impl From<hyper::Error> for Error {
-    fn from(error: hyper::Error) -> Self {
-        Self {
-            kind: ErrorKind::RequestError,
-            source: Some(Box::new(error)),
-        }
-    }
-}
-
 impl From<FractalError> for Error {
     fn from(error: FractalError) -> Self {
         Self {
@@ -65,10 +59,37 @@ impl From<FractalError> for Error {
     }
 }
 
-impl From<&str> for Error {
-    fn from(_: &str) -> Self {
+impl From<hyper::Error> for Error {
+    fn from(error: hyper::Error) -> Self {
         Self {
-            kind: ErrorKind::FieldError,
+            kind: ErrorKind::RequestError,
+            source: Some(Box::new(error)),
+        }
+    }
+}
+
+impl From<hyper::http::Error> for Error {
+    fn from(error: hyper::http::Error) -> Self {
+        Self {
+            kind: ErrorKind::RequestError,
+            source: Some(Box::new(error)),
+        }
+    }
+}
+
+impl From<hyper::http::uri::InvalidUri> for Error {
+    fn from(error: hyper::http::uri::InvalidUri) -> Self {
+        Self {
+            kind: ErrorKind::RequestError,
+            source: Some(Box::new(error)),
+        }
+    }
+}
+
+impl From<&'static str> for Error {
+    fn from(msg: &'static str) -> Self {
+        Self {
+            kind: ErrorKind::FieldError { msg },
             source: None,
         }
     }
