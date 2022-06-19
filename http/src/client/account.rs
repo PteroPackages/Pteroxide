@@ -27,12 +27,11 @@ impl<'a> GetAccount<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Account, Error> {
-        match self.http.request::<FractalData<Account>>(
+        let res = self.http.request::<FractalData<Account>>(
             Builder::new("/api/client/account")
-        ).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap().attributes)
     }
 }
 
@@ -74,16 +73,15 @@ impl<'a> GetApiKeys<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<ApiKey>, Error> {
-        match self.http.request::<FractalList<ApiKey>>(
+        let res = self.http.request::<FractalList<ApiKey>>(
             Builder::new("/api/client/account/api-keys")
-        ).await {
-            Ok(v) => Ok(v.unwrap()
-                .data
-                .iter()
-                .map(|k| k.attributes.clone())
-                .collect()),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap()
+            .data
+            .iter()
+            .map(|k| k.attributes.clone())
+            .collect())
     }
 }
 
@@ -165,14 +163,12 @@ impl<'a> CreateApiKey<'a> {
         let req = Builder::new("/api/client/account/api-keys")
             .method("POST")?
             .body(json!({
-            "description": self.description,
-            "allowed_ips": self.allowed_ips
+                "description": self.description,
+                "allowed_ips": self.allowed_ips
             }));
+        let res = self.http.request::<FractalData<ApiKey>>(req).await?;
 
-        match self.http.request::<FractalData<ApiKey>>(req).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        Ok(res.unwrap().attributes)
     }
 }
 
@@ -216,11 +212,9 @@ impl<'a> DeleteApiKey<'a> {
         let req = Builder::new(
             &format!("/api/client/account/api-keys/{}", self.id)
         ).method("DELETE")?;
+        self.http.request::<()>(req).await?;
 
-        match self.http.request::<()>(req).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        Ok(())
     }
 }
 
@@ -262,12 +256,11 @@ impl<'a> GetTwoFactorCode<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<String, Error> {
-        match self.http.request::<TwoFactorWrapper>(
+        let res = self.http.request::<TwoFactorWrapper>(
             Builder::new("/api/client/account/two-factor")
-        ).await {
-            Ok(v) => Ok(v.unwrap().data.image_url_data),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap().data.image_url_data)
     }
 }
 
@@ -359,10 +352,7 @@ impl<'a> UpdateAccount<'a> {
                     "password": data.1
                 }));
 
-            match self.http.request::<()>(req).await {
-                Ok(_) => (),
-                Err(e) => return Err(e),
-            }
+            self.http.request::<()>(req).await?;
         }
 
         if let Some(data) = self.password {
@@ -374,10 +364,7 @@ impl<'a> UpdateAccount<'a> {
                     "password_confirmation": data.1
                 }));
 
-            match self.http.request::<()>(req).await {
-                Ok(_) => (),
-                Err(e) => return Err(e),
-            }
+            self.http.request::<()>(req).await?;
         }
 
         Ok(())
@@ -476,10 +463,8 @@ impl<'a> UpdateTwoFactor<'a> {
                     "code": data
                 }));
 
-            return match self.http.request::<FractalData<TwoFactorTokenWrapper>>(req).await {
-                Ok(v) => Ok(Some(v.unwrap().attributes.tokens)),
-                Err(e) => Err(e),
-            }
+            let res = self.http.request::<FractalData<TwoFactorTokenWrapper>>(req).await?;
+            return Ok(Some(res.unwrap().attributes.tokens));
         }
 
         if let Some(data) = self.password {
@@ -489,10 +474,7 @@ impl<'a> UpdateTwoFactor<'a> {
                     "password": data
                 }));
 
-            return match self.http.request::<()>(req).await {
-                Ok(_) => Ok(None),
-                Err(e) => Err(e),
-            }
+            self.http.request::<()>(req).await?;
         }
 
         Ok(None)

@@ -63,16 +63,15 @@ impl<'a> GetServers<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<Server>, Error> {
-        match self.http.request::<FractalList<Server>>(
+        let res = self.http.request::<FractalList<Server>>(
             Builder::new(&format!("/api/client?type={}", self.access))
-        ).await {
-            Ok(v) => Ok(v.unwrap()
-                .data
-                .iter()
-                .map(|k| k.attributes.clone())
-                .collect()),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap()
+            .data
+            .iter()
+            .map(|k| k.attributes.clone())
+            .collect())
     }
 }
 
@@ -115,12 +114,11 @@ impl<'a> GetServerWebSocket<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<WebSocketAuth, Error> {
-        match self.http.request::<WebSocketWrapper>(
+        let res = self.http.request::<WebSocketWrapper>(
             Builder::new(&format!("/api/client/servers/{}/websocket", self.id))
-        ).await {
-            Ok(v) => Ok(v.unwrap().data),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap().data)
     }
 }
 
@@ -163,12 +161,11 @@ impl<'a> GetServerResources<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<ServerStatistics, Error> {
-        match self.http.request::<FractalData<ServerStatistics>>(
+        let res = self.http.request::<FractalData<ServerStatistics>>(
             Builder::new(&format!("/api/client/servers/{}/resources", self.id))
-        ).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap().attributes)
     }
 }
 
@@ -234,10 +231,9 @@ impl<'a> SendServerCommand<'a> {
                 "command": self.cmd
             }));
 
-        match self.http.request::<()>(req).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        self.http.request::<()>(req).await?;
+
+        Ok(())
     }
 }
 
@@ -298,9 +294,8 @@ impl<'a> SetPowerState<'a> {
                 "signal": self.state.to_string()
             }));
 
-        match self.http.request::<()>(req).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        self.http.request::<()>(req).await?;
+
+        Ok(())
     }
 }

@@ -49,16 +49,15 @@ impl<'a> GetBackups<'a> {
     /// 
     /// [`RequestError`]: crate::errors::ErrorKind::RequestError
     pub async fn exec(self) -> Result<Vec<Backup>, Error> {
-        match self.http.request::<FractalList<Backup>>(
+        let res = self.http.request::<FractalList<Backup>>(
             Builder::new(&format!("/api/client/servers/{}/backups", self.id))
-        ).await {
-            Ok(v) => Ok(v.unwrap()
-                .data
-                .iter()
-                .map(|b| b.attributes.clone())
-                .collect()),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap()
+            .data
+            .iter()
+            .map(|b| b.attributes.clone())
+            .collect())
     }
 }
 
@@ -143,10 +142,8 @@ impl<'a> CreateBackup<'a> {
                 "ignored": self.ignored
             }));
         }
+        let res = self.http.request::<FractalData<Backup>>(req).await?;
 
-        match self.http.request::<FractalData<Backup>>(req).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        Ok(res.unwrap().attributes)
     }
 }

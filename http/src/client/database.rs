@@ -22,16 +22,15 @@ impl<'a> GetDatabases<'a> {
     }
 
     pub async fn exec(self) -> Result<Vec<Database>, Error> {
-        match self.http.request::<FractalList<Database>>(
+        let res = self.http.request::<FractalList<Database>>(
             Builder::new(&format!("/api/client/servers/{}/databases", self.id))
-        ).await {
-            Ok(v) => Ok(v.unwrap()
-                .data
-                .iter()
-                .map(|d| d.attributes.clone())
-                .collect()),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap()
+            .data
+            .iter()
+            .map(|d| d.attributes.clone())
+            .collect())
     }
 }
 
@@ -77,10 +76,9 @@ impl<'a> CreateDatabase<'a> {
                 "remote": self.remote
             }));
 
-        match self.http.request::<FractalData<Database>>(req).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        let res = self.http.request::<FractalData<Database>>(req).await?;
+
+        Ok(res.unwrap().attributes)
     }
 }
 
@@ -114,11 +112,9 @@ impl<'a> RotateDatabasePassword<'a> {
         let req = Builder::new(
             &format!("/api/client/servers/{}/database/{}/rotate-password", self.id, self.uid)
         ).method("POST")?;
+        let res = self.http.request::<FractalData<Database>>(req).await?;
 
-        match self.http.request::<FractalData<Database>>(req).await {
-            Ok(v) => Ok(v.unwrap().attributes),
-            Err(e) => Err(e),
-        }
+        Ok(res.unwrap().attributes)
     }
 }
 
@@ -152,10 +148,8 @@ impl<'a> DeleteDatabase<'a> {
         let req = Builder::new(
             &format!("/api/client/servers/{}/databases/{}", self.id, self.uid)
         ).method("DELETE")?;
+        self.http.request::<()>(req).await?;
 
-        match self.http.request::<()>(req).await {
-            Ok(_) => Ok(()),
-            Err(e) => Err(e),
-        }
+        Ok(())
     }
 }

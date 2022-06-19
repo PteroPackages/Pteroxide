@@ -38,18 +38,17 @@ impl<'a> GetFiles<'a> {
     }
 
     pub async fn exec(self) -> Result<Vec<File>, Error> {
-        match self.http.request::<FractalList<File>>(
+        let res = self.http.request::<FractalList<File>>(
             Builder::new(
                 &format!("/api/client/servers/{}/files/list?directory={}", self.id, self.dir)
             )
-        ).await {
-            Ok(v) => Ok(v.unwrap()
-                .data
-                .iter()
-                .map(|f| f.attributes.clone())
-                .collect()),
-            Err(e) => Err(e),
-        }
+        ).await?;
+
+        Ok(res.unwrap()
+            .data
+            .iter()
+            .map(|f| f.attributes.clone())
+            .collect())
     }
 }
 
@@ -83,11 +82,9 @@ impl<'a> GetFileContents<'a> {
         let req = Builder::new(
             &format!("/api/client/servers/{}/files/contents?file={}", self.id, self.name)
         ).content_type("text/plain");
+        let res = self.http.request_raw(req).await?;
 
-        match self.http.request_raw(req).await {
-            Ok(v) => Ok(v.unwrap()),
-            Err(e) => Err(e),
-        }
+        Ok(res.unwrap())
     }
 }
 
@@ -140,10 +137,10 @@ impl<'a> Downloader<'a> {
         }
         let data = body::to_bytes(res).await?;
 
-        match fs::write(&self.path.clone(), data.to_vec()) {
-            Ok(_) => Ok(()),
-            Err(_) => Err(Error::from("failed to write data to file")),
-        }
+        fs::write(self.path.clone(), data.to_vec())
+            .expect("failed to write data to file");
+
+        Ok(())
     }
 }
 
