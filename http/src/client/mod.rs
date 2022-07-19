@@ -26,7 +26,7 @@ use self::{
     },
     backup::{CreateBackup, GetBackups},
     database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
-    file::{DownloadFile, GetFileContents, GetFiles, RenameFile},
+    file::{CopyFile, DownloadFile, GetFileContents, GetFiles, RenameFile},
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
     },
@@ -243,6 +243,10 @@ impl Client {
 
     pub fn rename_files(&self, id: String) -> RenameFile {
         RenameFile::new(self, id)
+    }
+
+    pub fn copy_server_file(&self, id: String) -> CopyFile {
+        CopyFile::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.

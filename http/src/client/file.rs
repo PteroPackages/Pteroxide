@@ -233,3 +233,38 @@ impl<'a> RenameFile<'a> {
         Ok(())
     }
 }
+
+pub struct CopyFile<'a> {
+    http: &'a Client,
+    id: String,
+    location: String,
+}
+
+impl<'a> CopyFile<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self { http, id, location: Default::default() }
+    }
+
+    pub fn location(mut self, path: String) -> Self {
+        self.location = path;
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.location.is_empty() {
+            return Err(Error::from("a location is required"))
+        }
+
+        let req = Builder::new(&format!("/api/client/servers/{}/files/copy", self.id))
+            .method("POST")?
+            .body(json!({
+                "location": self.location
+            }));
+
+        self.http.request::<()>(req).await?;
+
+        Ok(())
+    }
+}
