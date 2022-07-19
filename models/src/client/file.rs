@@ -18,3 +18,9 @@ impl File {
         self.mode_bits.parse::<u64>().unwrap()
     }
 }
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct RenameFileData {
+    pub from: String,
+    pub to: String,
+}
