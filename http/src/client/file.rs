@@ -7,7 +7,8 @@ use pteroxide_models::{
     client::file::{File, RenameFileData},
     global::UrlData,
 };
-use std::fs;
+use std::fs::{self, File as FsFile};
+use std::io::{BufReader, Read};
 use std::path::Path;
 
 use crate::{
@@ -262,6 +263,60 @@ impl<'a> CopyFile<'a> {
             .body(json!({
                 "location": self.location
             }));
+
+        self.http.request::<()>(req).await?;
+
+        Ok(())
+    }
+}
+
+pub struct WriteFile<'a> {
+    http: &'a Client,
+    id: String,
+    name: String,
+    data: Vec<u8>,
+}
+
+impl<'a> WriteFile<'a> {
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            name: Default::default(),
+            data: Default::default(),
+        }
+    }
+
+    pub fn name(mut self, name: String) -> Self {
+        self.name = name;
+
+        self
+    }
+
+    pub fn content(mut self, content: String) -> Self {
+        self.data = content.as_bytes().to_vec();
+
+        self
+    }
+
+    pub fn from_file(mut self, file: FsFile) -> Self {
+        let mut reader = BufReader::new(file);
+        reader.read_to_end(&mut self.data).expect("could not read from file");
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.name.is_empty() {
+            return Err(Error::from("a file name is required"))
+        }
+
+        let mut req = Builder::new(
+            &format!("/api/client/servers/{}/files/write?file={}", self.id, self.name)
+        ).method("POST")?
+            .content_type("text/plain");
+
+        req.body = Body::from(self.data);
 
         self.http.request::<()>(req).await?;
 
