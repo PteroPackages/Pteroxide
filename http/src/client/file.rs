@@ -473,3 +473,52 @@ impl<'a> DeleteFiles<'a> {
         Ok(())
     }
 }
+
+pub struct CreateFolder<'a> {
+    http: &'a Client,
+    id: String,
+    root: String,
+    name: String,
+}
+
+impl<'a> CreateFolder<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            root: String::from("/"),
+            name: Default::default(),
+        }
+    }
+
+    pub fn root(mut self, path: String) -> Self {
+        self.root = path;
+
+        self
+    }
+
+    pub fn name(mut self, name: String) -> Self {
+        self.name = name;
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.name.is_empty() {
+            return Err(Error::from("a folder name is required"));
+        }
+
+        let req = Builder::new(
+            &format!("/api/client/servers/{}/files/create-folder", self.id)
+        ).method("POST")?
+            .body(json!({
+                "root": self.root,
+                "name": self.name
+            }));
+
+        self.http.request::<()>(req).await?;
+
+        Ok(())
+    }
+}
