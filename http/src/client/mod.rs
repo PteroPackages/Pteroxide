@@ -27,8 +27,8 @@ use self::{
     backup::{CreateBackup, GetBackups},
     database::{CreateDatabase, DeleteDatabase, GetDatabases, RotateDatabasePassword},
     file::{
-        CompressFiles, CopyFile, DecompressFile, DownloadFile, GetFileContents, GetFiles,
-        RenameFile, WriteFile
+        CompressFiles, CopyFile, DecompressFile, DeleteFiles, DownloadFile, GetFileContents,
+        GetFiles, RenameFile, WriteFile
     },
     server::{
         GetServers, GetServerResources, GetServerWebSocket, SendServerCommand, SetPowerState,
@@ -262,6 +262,10 @@ impl Client {
 
     pub fn decompress_server_file(&self, id: String) -> DecompressFile {
         DecompressFile::new(self, id)
+    }
+
+    pub fn delete_server_files(&self, id: String) -> DeleteFiles {
+        DeleteFiles::new(self, id)
     }
 
     /// Returns a request builder for getting server backups.

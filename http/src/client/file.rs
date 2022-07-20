@@ -425,3 +425,51 @@ impl<'a> DecompressFile<'a> {
         Ok(())
     }
 }
+
+pub struct DeleteFiles<'a> {
+    http: &'a Client,
+    id: String,
+    root: String,
+    files: Vec<String>,
+}
+
+impl<'a> DeleteFiles<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            root: String::from("/"),
+            files: Default::default(),
+        }
+    }
+
+    pub fn root(mut self, path: String) -> Self {
+        self.root = path;
+
+        self
+    }
+
+    pub fn set(mut self, file: String) -> Self {
+        self.files.push(file);
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.files.is_empty() {
+            return Err(Error::from("at least one file must be specified"));
+        }
+
+        let req = Builder::new(&format!("/api/client/servers/{}/files/delete", self.id))
+            .method("POST")?
+            .body(json!({
+                "root": self.root,
+                "files": self.files
+            }));
+
+        self.http.request::<()>(req).await?;
+
+        Ok(())
+    }
+}
