@@ -278,6 +278,7 @@ pub struct WriteFile<'a> {
 }
 
 impl<'a> WriteFile<'a> {
+    #[doc(hidden)]
     pub fn new(http: &'a Client, id: String) -> Self {
         Self {
             http,
@@ -317,6 +318,107 @@ impl<'a> WriteFile<'a> {
             .content_type("text/plain");
 
         req.body = Body::from(self.data);
+
+        self.http.request::<()>(req).await?;
+
+        Ok(())
+    }
+}
+
+pub struct CompressFiles<'a> {
+    http: &'a Client,
+    id: String,
+    root: String,
+    files: Vec<String>,
+}
+
+impl<'a> CompressFiles<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            root: String::from("/"),
+            files: Default::default(),
+        }
+    }
+
+    pub fn root(mut self, dir: String) -> Self {
+        if dir.starts_with("/home/container") {
+            self.root = dir.strip_prefix("/home/container").unwrap().to_string();
+        } else {
+            self.root = dir;
+        }
+
+        self
+    }
+
+    pub fn set(mut self, file: String) -> Self {
+        self.files.push(file);
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<File, Error> {
+        if self.files.is_empty() {
+            return Err(Error::from("at least one file must be specified"));
+        }
+
+        let req = Builder::new(&format!("/api/client/servers/{}/files/compress", self.id))
+            .method("POST")?
+            .body(json!({
+                "root": self.root,
+                "files": self.files
+            }));
+
+
+        let res = self.http.request::<FractalData<File>>(req).await?;
+
+        Ok(res.unwrap().attributes)
+    }
+}
+
+pub struct DecompressFile<'a> {
+    http: &'a Client,
+    id: String,
+    root: String,
+    file: String,
+}
+
+impl<'a> DecompressFile<'a> {
+    #[doc(hidden)]
+    pub fn new(http: &'a Client, id: String) -> Self {
+        Self {
+            http,
+            id,
+            root: String::from("/"),
+            file: Default::default(),
+        }
+    }
+
+    pub fn root(mut self, path: String) -> Self {
+        self.root = path;
+
+        self
+    }
+
+    pub fn file(mut self, name: String) -> Self {
+        self.file = name;
+
+        self
+    }
+
+    pub async fn exec(self) -> Result<(), Error> {
+        if self.file.is_empty() {
+            return Err(Error::from("a file name is required"));
+        }
+
+        let req = Builder::new(&format!("/api/client/servers/{}/files/decompress", self.id))
+            .method("POST")?
+            .body(json!({
+                "root": self.root,
+                "file": self.file
+            }));
 
         self.http.request::<()>(req).await?;
 
