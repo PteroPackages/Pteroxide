@@ -1,2 +1,5 @@
 [workspace]
-members = ["models"]
+members = [
+    "pteroxide-http",
+    "pteroxide-models"
+]
