@@ -1,0 +1,12 @@
+[package]
+name = "pteroxide-models"
+version = "0.1.0"
+edition = "2021"
+authors = [
+    "Devonte W <https://github.com/devnote-dev>"
+]
+license = "MIT"
+repository = "https://github.com/PteroPackages/Pteroxide"
+
+[dependencies]
+serde = { features = ["derive"], version = "1.0.147" }

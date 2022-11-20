@@ -1,6 +1,2 @@
 [workspace]
-members = [
-    "http",
-    "models",
-    "test"
-]
+members = ["models"]
