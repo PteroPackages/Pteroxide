@@ -52,7 +52,7 @@ pub struct FractalItem<T> {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FractalList<T> {
     pub object: String,
-    pub data: FractalItem<T>,
+    pub data: Vec<FractalItem<T>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
