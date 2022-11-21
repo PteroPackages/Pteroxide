@@ -2,6 +2,7 @@ use std::{error, fmt::{Display, Formatter, Result as FmtResult}};
 
 use pteroxide_models::FractalError;
 
+/// Represents an interface for pteroxide-http errors, including errors received from the API.
 #[derive(Debug)]
 pub struct Error {
     pub(super) source: Option<Box<dyn error::Error + Send + Sync>>,
@@ -66,6 +67,7 @@ impl From<hyper::http::Error> for Error {
     }
 }
 
+/// The different kinds of errors that can be returned in pteroxide-http.
 #[derive(Debug)]
 pub enum ErrorKind {
     DeserializeError,

@@ -1,5 +1,6 @@
 use hyper::Method;
 
+/// Route members implementation for the application API.
 pub enum Route {
     ListUsers,
     GetUser { id: i32 },

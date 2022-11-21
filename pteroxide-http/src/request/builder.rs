@@ -2,6 +2,7 @@ use hyper::{Body, header::HeaderValue, Method};
 
 use super::routing::application;
 
+/// Builder utility for creating HTTP requests, abstracting from the default HTTP request struct.
 pub struct Builder {
     pub(crate) method: Method,
     pub(crate) route: String,
