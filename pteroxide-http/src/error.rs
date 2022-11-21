@@ -14,12 +14,12 @@ impl Error {
         &self.kind
     }
 
-    pub fn into_parts(&self) -> (&ErrorKind, Option<&Box<dyn error::Error + Send + Sync>>) {
-        (&self.kind, self.source.as_ref())
+    pub fn into_parts(self) -> (ErrorKind, Option<Box<dyn error::Error + Send + Sync>>) {
+        (self.kind, self.source)
     }
 
-    pub fn into_source(&self) -> Option<&Box<dyn error::Error + Send + Sync>> {
-        self.source.as_ref()
+    pub fn into_source(self) -> Option<Box<dyn error::Error + Send + Sync>> {
+        self.source
     }
 }
 
@@ -43,8 +43,8 @@ impl error::Error for Error {
 impl From<FractalError> for Error {
     fn from(e: FractalError) -> Self {
         Self {
-            kind: ErrorKind::FractalError(e.to_owned()),
-            source: Some(Box::new(e.to_owned())),
+            kind: ErrorKind::FractalError(e.clone()),
+            source: Some(Box::new(e)),
         }
     }
 }

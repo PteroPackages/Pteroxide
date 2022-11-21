@@ -19,7 +19,7 @@ impl ToString for Route {
     fn to_string(&self) -> String {
         match self {
             Route::ListUsers => String::from("/api/application/users"),
-            Route::GetUser { id } => String::from(format!("/api/application/users/{}", id)),
+            Route::GetUser { id } => format!("/api/application/users/{}", id),
         }
     }
 }
