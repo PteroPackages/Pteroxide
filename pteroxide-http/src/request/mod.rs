@@ -12,6 +12,7 @@ use crate::{error::Error, request::builder::Builder};
 pub mod builder;
 pub mod routing;
 
+/// The HTTP client for interacting with the application and client API.
 #[derive(Debug)]
 pub struct Http {
     client: HClient<HttpsConnector<HttpConnector>>,
@@ -43,8 +44,8 @@ impl Http {
             .method(builder.method)
             .header(USER_AGENT, "Pteroxide HTTP Client")
             .header(AUTHORIZATION, self.key)
-            .header(CONTENT_TYPE, builder.content_type.clone())
-            .header(ACCEPT, builder.content_type.clone()) // TODO: change this
+            .header(CONTENT_TYPE, builder.content_type)
+            .header(ACCEPT, builder.accept_type)
             .body(builder.body)?;
 
         let res = self.client.request(req).await?;
