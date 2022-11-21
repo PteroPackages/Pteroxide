@@ -11,4 +11,5 @@ repository = "https://github.com/PteroPackages/Pteroxide"
 [dependencies]
 hyper = { version = "0.14.23" }
 serde = { features = ["derive"], version = "1.0.147" }
+serde_json = "1.0"
 pteroxide-models = { path = "../pteroxide-models" }
