@@ -8,6 +8,7 @@ pub struct Builder {
     pub(crate) route: String,
     pub(crate) body: Body,
     pub(crate) content_type: HeaderValue,
+    pub(crate) accept_type: HeaderValue,
 }
 
 impl Builder {
@@ -36,6 +37,12 @@ impl Builder {
 
         self
     }
+
+    pub fn accept_type(mut self, value: &str) -> Self {
+        self.accept_type = HeaderValue::from_str(value).unwrap();
+
+        self
+    }
 }
 
 impl Default for Builder {
@@ -45,6 +52,7 @@ impl Default for Builder {
             route: Default::default(),
             body: Body::empty(),
             content_type: HeaderValue::from_str("application/json").unwrap(),
+            accept_type: HeaderValue::from_str("application/json").unwrap(),
         }
     }
 }
