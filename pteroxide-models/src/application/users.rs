@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
-    pub id: u32,
+    pub id: i32,
     pub external_id: Option<String>,
     pub uuid: String,
     pub username: String,
@@ -19,7 +19,7 @@ pub struct User {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SubUser {
-    pub id: u32,
+    pub id: i32,
     pub user_id: u32,
     pub server_id: u32,
     pub permissions: Vec<String>,

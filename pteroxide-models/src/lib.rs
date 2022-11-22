@@ -10,7 +10,7 @@ pub struct FeatureLimits {
     databases: u32,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ErrorData {
     pub code: String,
     pub status: String,
@@ -23,7 +23,7 @@ impl Display for ErrorData {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FractalError {
     pub errors: Vec<ErrorData>,
 }
