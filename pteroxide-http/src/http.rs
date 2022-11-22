@@ -2,12 +2,13 @@ use hyper::{
     body::{self, Buf},
     Client as HClient,
     client::HttpConnector, header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
-    Request, StatusCode,
+    Request,
+    StatusCode,
 };
 use hyper_tls::HttpsConnector;
 use serde::Deserialize;
 
-use crate::{error::Error, request::builder::Builder};
+use crate::{Builder, Error};
 use pteroxide_models::FractalError;
 
 /// The HTTP client for interacting with the application and client API.

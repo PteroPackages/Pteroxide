@@ -1,8 +1,4 @@
-use crate::{
-    error::Error,
-    http::Http,
-    request::{Builder, routing::application::Route},
-};
+use crate::{Builder, Error, Http, routing::application::Route};
 
 use pteroxide_models::{application::User, FractalList};
 
