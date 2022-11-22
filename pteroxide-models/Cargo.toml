@@ -12,7 +12,9 @@ repository = "https://github.com/PteroPackages/Pteroxide"
 serde = { features = ["derive"], version = "1.0.147" }
 
 [features]
-default = ["app"]
+default = ["app", "fractal"]
+
+all = ["app", "app-relations", "fractal"]
 
 app = ["app-relations"]
 
@@ -21,5 +23,7 @@ app-relations = []
 # client = ["client-relations"]
 
 # client-relations = []
+
+fractal = []
 
 # wings = []
