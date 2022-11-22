@@ -19,6 +19,7 @@ impl Builder {
     }
 
     pub fn route(mut self, route: application::Route) -> Self {
+        self.method = route.method();
         self.route = route.to_string();
 
         self
@@ -49,7 +50,7 @@ impl Builder {
 impl Default for Builder {
     fn default() -> Self {
         Self {
-            method: Method::GET,
+            method: Default::default(),
             route: Default::default(),
             body: Body::empty(),
             content_type: HeaderValue::from_str("application/json").unwrap(),

@@ -15,7 +15,7 @@ impl GetUsers {
     pub async fn exec(self) -> Result<Vec<User>, Error> {
         let res = self
             .http
-            .request::<FractalList<User>>(Builder::default().route(Route::ListUsers))
+            .request::<FractalList<User>>(Builder::default().route(Route::GetUsers))
             .await?;
 
         Ok(res.data.iter().map(|u| u.attributes.clone()).collect())
