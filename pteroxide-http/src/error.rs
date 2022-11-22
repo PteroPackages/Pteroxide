@@ -1,6 +1,8 @@
-use std::{error, fmt::{Display, Formatter, Result as FmtResult}};
-
 use pteroxide_models::FractalError;
+use std::{
+    error,
+    fmt::{Display, Formatter, Result as FmtResult},
+};
 
 /// Represents an interface for pteroxide-http errors, including errors received from the API.
 #[derive(Debug)]
@@ -27,16 +29,23 @@ impl Display for Error {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
         match &self.kind {
             ErrorKind::DeserializeError => f.write_str("Failed to deserialize body into model"),
-            ErrorKind::RatelimitError => f.write_str("Received a ratelimit while processing request"),
+            ErrorKind::RatelimitError => {
+                f.write_str("Received a ratelimit while processing request")
+            }
             ErrorKind::RequestError => f.write_str("Request failed while processing"),
-            ErrorKind::FractalError(e) => f.write_str(&format!("Received an error from the API ({})", e.errors[0].code)),
+            ErrorKind::FractalError(e) => f.write_str(&format!(
+                "Received an error from the API ({})",
+                e.errors[0].code
+            )),
         }
     }
 }
 
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        self.source.as_ref().map(|s| &**s as &(dyn error::Error + 'static))
+        self.source
+            .as_ref()
+            .map(|s| &**s as &(dyn error::Error + 'static))
     }
 }
 

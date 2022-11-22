@@ -9,8 +9,7 @@ pub enum Route {
 impl Route {
     pub const fn method(&self) -> Method {
         match self {
-            Route::ListUsers
-            | Route::GetUser { .. } => Method::GET
+            Route::ListUsers | Route::GetUser { .. } => Method::GET,
         }
     }
 }

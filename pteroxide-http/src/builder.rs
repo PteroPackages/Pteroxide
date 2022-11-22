@@ -1,4 +1,4 @@
-use hyper::{Body, header::HeaderValue, Method};
+use hyper::{header::HeaderValue, Body, Method};
 
 use super::routing::application;
 
@@ -25,7 +25,8 @@ impl Builder {
     }
 
     pub fn body<T>(mut self, body: T) -> Self
-    where Body: From<T>
+    where
+        Body: From<T>,
     {
         self.body = Body::from(body);
 

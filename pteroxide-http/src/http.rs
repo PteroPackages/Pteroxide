@@ -1,15 +1,14 @@
 use hyper::{
     body::{self, Buf},
-    Client as HClient,
-    client::HttpConnector, header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
-    Request,
-    StatusCode,
+    client::HttpConnector,
+    header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
+    Client as HClient, Request, StatusCode,
 };
 use hyper_tls::HttpsConnector;
+use pteroxide_models::FractalError;
 use serde::Deserialize;
 
-use crate::{Builder, Error};
-use pteroxide_models::FractalError;
+use super::{Builder, Error};
 
 /// The HTTP client for interacting with the application and client API.
 #[derive(Debug)]
@@ -34,7 +33,7 @@ impl Http {
 
     pub async fn request<T>(self, builder: Builder) -> Result<T, Error>
     where
-        for<'de> T: Deserialize<'de>
+        for<'de> T: Deserialize<'de>,
     {
         let uri = format!("{}{}", self.url, builder.route);
         let req = Request::builder()
@@ -57,14 +56,14 @@ impl Http {
                     .expect("failed to deserialize into model");
 
                 Ok(data)
-            },
+            }
             _ => {
                 let buf = body::aggregate(res).await?;
                 let data = serde_json::from_reader::<_, FractalError>(buf.reader())
                     .expect("failed to deserialize into model");
 
                 Err(Error::from(data))
-            },
+            }
         }
     }
 }

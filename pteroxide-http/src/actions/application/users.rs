@@ -1,6 +1,6 @@
-use crate::{Builder, Error, Http, routing::application::Route};
-
 use pteroxide_models::{application::User, FractalList};
+
+use crate::{routing::application::Route, Builder, Error, Http};
 
 #[derive(Debug)]
 pub struct GetUsers {
@@ -13,13 +13,11 @@ impl GetUsers {
     }
 
     pub async fn exec(self) -> Result<Vec<User>, Error> {
-        let res = self.http.request::<FractalList<User>>(
-            Builder::default().route(Route::ListUsers)
-        ).await?;
+        let res = self
+            .http
+            .request::<FractalList<User>>(Builder::default().route(Route::ListUsers))
+            .await?;
 
-        Ok(res.data
-            .iter()
-            .map(|u| u.attributes.clone())
-            .collect())
+        Ok(res.data.iter().map(|u| u.attributes.clone()).collect())
     }
 }

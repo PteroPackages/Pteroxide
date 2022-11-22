@@ -1,5 +1,8 @@
 use serde::{Deserialize, Serialize};
-use std::{error::Error, fmt::{Display, Formatter, Result as FmtResult}};
+use std::{
+    error::Error,
+    fmt::{Display, Formatter, Result as FmtResult},
+};
 
 pub mod application;
 
@@ -19,7 +22,11 @@ pub struct ErrorData {
 
 impl Display for ErrorData {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(f, "code: {}; status: {}; detail: {}", self.code, self.status, self.detail)
+        write!(
+            f,
+            "code: {}; status: {}; detail: {}",
+            self.code, self.status, self.detail
+        )
     }
 }
 
