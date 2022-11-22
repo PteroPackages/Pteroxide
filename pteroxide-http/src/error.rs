@@ -5,8 +5,8 @@ use pteroxide_models::FractalError;
 /// Represents an interface for pteroxide-http errors, including errors received from the API.
 #[derive(Debug)]
 pub struct Error {
-    pub(super) source: Option<Box<dyn error::Error + Send + Sync>>,
     pub(super) kind: ErrorKind,
+    pub(super) source: Option<Box<dyn error::Error + Send + Sync>>,
 }
 
 impl Error {
