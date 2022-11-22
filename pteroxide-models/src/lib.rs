@@ -4,6 +4,7 @@ use std::{
     fmt::{Display, Formatter, Result as FmtResult},
 };
 
+#[cfg(feature = "app")]
 pub mod application;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
