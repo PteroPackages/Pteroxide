@@ -20,8 +20,8 @@ pub struct User {
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SubUser {
     pub id: i32,
-    pub user_id: u32,
-    pub server_id: u32,
+    pub user_id: i32,
+    pub server_id: i32,
     pub permissions: Vec<String>,
     pub created_at: String,
     pub updated_at: Option<String>,
