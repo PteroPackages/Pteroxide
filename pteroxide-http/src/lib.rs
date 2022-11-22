@@ -2,10 +2,9 @@
 //!
 //! [`pteroxide-models`]: pteroxide_models
 
-pub mod actions;
+pub mod application;
 pub mod builder;
 pub mod error;
-pub mod http;
 pub mod routing;
 
-pub use self::{builder::Builder, error::Error, http::Http};
+pub use self::{application::Application, builder::Builder, error::Error};
