@@ -51,4 +51,14 @@ pub struct FractalItem<T> {
 pub struct FractalList<T> {
     pub object: String,
     pub data: Vec<FractalItem<T>>,
+    pub meta: FractalMeta,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+pub struct FractalMeta {
+    pub count: i32,
+    pub total: i32,
+    pub current_page: i32,
+    pub per_page: i32,
+    pub total_pages: i32,
 }
