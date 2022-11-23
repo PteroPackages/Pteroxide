@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::Server;
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
     pub id: i32,
@@ -15,6 +17,14 @@ pub struct User {
     pub two_factor: bool,
     pub created_at: String,
     pub updated_at: Option<String>,
+    #[cfg(feature = "app-relations")]
+    #[serde(skip_serializing)]
+    pub relationships: UserRelations,
+}
+
+#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+pub struct UserRelations {
+    pub servers: Option<Vec<Server>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
