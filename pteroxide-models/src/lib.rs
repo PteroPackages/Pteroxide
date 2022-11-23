@@ -6,6 +6,9 @@ pub mod application;
 #[cfg(feature = "fractal")]
 pub mod fractal;
 
+#[cfg(feature = "time")]
+pub mod time;
+
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FeatureLimits {
     allocations: u32,

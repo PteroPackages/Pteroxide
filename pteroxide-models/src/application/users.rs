@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "time")]
+use time::Time;
 
 use super::Server;
+#[cfg(feature = "time")]
+use crate::time as util;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
@@ -21,6 +25,30 @@ pub struct User {
     #[serde(default)]
     #[serde(skip_serializing)]
     pub relationships: Option<UserRelations>,
+}
+
+#[cfg(feature = "time")]
+impl User {
+    pub fn parse_created_at(&self) -> Time {
+        util::parse(self.created_at.clone())
+    }
+
+    pub fn try_parse_created_at(&self) -> Option<Time> {
+        match util::try_parse(self.created_at.clone()) {
+            Ok(t) => Some(t),
+            Err(_) => None,
+        }
+    }
+
+    pub fn parse_updated_at(&self) -> Option<Time> {
+        match &self.updated_at {
+            Some(s) => match util::try_parse(s.clone()) {
+                Ok(t) => Some(t),
+                Err(_) => None,
+            },
+            None => None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]

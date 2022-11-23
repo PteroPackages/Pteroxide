@@ -10,9 +10,10 @@ repository = "https://github.com/PteroPackages/Pteroxide"
 
 [dependencies]
 serde = { features = ["derive"], version = "1.0.147" }
+time = { features = ["parsing"], optional = true, version = "0.3.17" }
 
 [features]
-default = ["app", "fractal"]
+default = ["app", "fractal", "time"]
 
 all = ["app", "app-relations", "fractal"]
 
@@ -25,5 +26,7 @@ app-relations = []
 # client-relations = []
 
 fractal = []
+
+time = ["dep:time"]
 
 # wings = []
