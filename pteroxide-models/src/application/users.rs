@@ -18,8 +18,9 @@ pub struct User {
     pub created_at: String,
     pub updated_at: Option<String>,
     #[cfg(feature = "app-relations")]
+    #[serde(default)]
     #[serde(skip_serializing)]
-    pub relationships: UserRelations,
+    pub relationships: Option<UserRelations>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
