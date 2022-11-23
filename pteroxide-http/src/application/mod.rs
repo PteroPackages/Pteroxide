@@ -5,7 +5,7 @@ use hyper::{
     Client as HClient, Request, StatusCode,
 };
 use hyper_tls::HttpsConnector;
-use pteroxide_models::FractalError;
+use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 
 use self::users::GetUsers;

@@ -1,4 +1,4 @@
-use pteroxide_models::{application::User, FractalList};
+use pteroxide_models::{application::User, fractal::FractalList};
 
 use crate::{routing::application::Route, Application, Builder, Error};
 

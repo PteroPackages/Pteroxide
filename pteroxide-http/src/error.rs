@@ -1,4 +1,4 @@
-use pteroxide_models::FractalError;
+use pteroxide_models::fractal::FractalError;
 use std::{
     error,
     fmt::{Display, Formatter, Result as FmtResult},
