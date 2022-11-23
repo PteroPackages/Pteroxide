@@ -56,7 +56,7 @@ impl<'a> From<&'a str> for Status {
 
 impl From<String> for Status {
     fn from(value: String) -> Self {
-        Status::from(value.as_str().to_owned())
+        Self::from(value.as_str())
     }
 }
 
