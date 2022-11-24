@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use time::Time;
 
 use super::Server;
+use crate::fractal::FractalList;
 #[cfg(feature = "time")]
 use crate::time as util;
 
@@ -53,7 +54,7 @@ impl User {
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
 pub struct UserRelations {
-    pub servers: Option<Vec<Server>>,
+    pub servers: Option<FractalList<Server>>,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
