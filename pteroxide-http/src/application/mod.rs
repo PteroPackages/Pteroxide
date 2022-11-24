@@ -8,7 +8,7 @@ use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 
-use self::users::GetUsers;
+use self::users::{GetUser, GetUsers};
 use super::{Builder, Error};
 
 pub mod users;
@@ -69,7 +69,11 @@ impl Application {
         }
     }
 
-    pub fn get_users(&self) -> GetUsers<'_> {
+    pub const fn get_users(&self) -> GetUsers<'_> {
         GetUsers::new(self)
+    }
+
+    pub const fn get_user(&self, id: i32) -> GetUser<'_> {
+        GetUser::new(self, id)
     }
 }
