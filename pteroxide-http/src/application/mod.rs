@@ -34,13 +34,12 @@ impl Application {
         }
     }
 
-    pub async fn request<T>(&self, builder: Builder) -> Result<T, Error>
+    pub async fn request<T>(&self, builder: Builder<'_>) -> Result<T, Error>
     where
         for<'de> T: Deserialize<'de>,
     {
-        let uri = format!("{}{}", self.url, builder.route);
         let req = Request::builder()
-            .uri(uri)
+            .uri(builder.uri(self.url.clone()))
             .method(builder.method)
             .header(USER_AGENT, "Pteroxide HTTP Client")
             .header(AUTHORIZATION, self.key.clone())
