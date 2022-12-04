@@ -15,7 +15,7 @@ time = { features = ["parsing"], optional = true, version = "0.3.17" }
 [features]
 default = ["app", "fractal", "time"]
 
-all = ["app", "app-relations", "fractal", "time", "util"]
+all = ["app", "app-relations", "fractal", "time"]
 
 app = ["app-relations"]
 
@@ -28,7 +28,5 @@ app-relations = []
 fractal = []
 
 time = ["dep:time"]
-
-util = ["time"]
 
 # wings = []

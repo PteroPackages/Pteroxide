@@ -4,6 +4,7 @@ use std::{
     fmt::{Display, Formatter, Result as FmtResult},
 };
 
+/// Represents the inner data of a Fractal error.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct ErrorData {
     pub code: String,
@@ -21,6 +22,7 @@ impl Display for ErrorData {
     }
 }
 
+/// A wrapper object containing the Fractal [`ErrorData`].
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FractalError {
     pub errors: Vec<ErrorData>,
@@ -41,12 +43,14 @@ impl Display for FractalError {
 
 impl Error for FractalError {}
 
+/// Represents a Fractal item object which wraps the inner type.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FractalItem<T> {
     pub object: String,
     pub attributes: T,
 }
 
+/// Represents a Fractal list object which contains a list of [`FractalItem`] objects.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FractalList<T> {
     pub object: String,

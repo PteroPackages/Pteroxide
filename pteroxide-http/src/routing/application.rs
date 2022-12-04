@@ -7,6 +7,7 @@ pub enum Route {
 }
 
 impl Route {
+    /// Returns the corresponding method for the current route.
     pub const fn method(&self) -> Method {
         match self {
             Route::GetUsers | Route::GetUser { .. } => Method::GET,

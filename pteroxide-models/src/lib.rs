@@ -4,9 +4,10 @@ use serde::{Deserialize, Serialize};
 pub mod application;
 #[cfg(feature = "fractal")]
 pub mod fractal;
-#[cfg(any(feature = "time", feature = "util"))]
+#[cfg(feature = "time")]
 pub mod util;
 
+/// Represents the feature limits of a server.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FeatureLimits {
     allocations: i32,
@@ -14,6 +15,7 @@ pub struct FeatureLimits {
     databases: i32,
 }
 
+/// Represents the limits of a server.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Limits {
     pub memory: i64,

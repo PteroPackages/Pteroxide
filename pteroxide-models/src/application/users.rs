@@ -9,6 +9,7 @@ use crate::fractal::FractalList;
 #[cfg(feature = "time")]
 use crate::util::{self, Time};
 
+/// Represents a user object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
     pub id: i32,
@@ -32,10 +33,13 @@ pub struct User {
 
 #[cfg(feature = "time")]
 impl User {
+    /// Parses the string created at time string into a [`Time`] object.
     pub fn parse_created_at(&self) -> Time {
         util::parse(self.created_at.clone())
     }
 
+    /// Attempts to parse the created at time string into a [`Time`] object, returning an
+    /// option.
     pub fn try_parse_created_at(&self) -> Option<Time> {
         match util::try_parse(self.created_at.clone()) {
             Ok(t) => Some(t),
@@ -43,6 +47,8 @@ impl User {
         }
     }
 
+    /// Parses the updated at time string into a [`Time`] object, returning an option if the field
+    /// has a value.
     pub fn parse_updated_at(&self) -> Option<Time> {
         match &self.updated_at {
             Some(s) => match util::try_parse(s.clone()) {
@@ -56,6 +62,7 @@ impl User {
 
 #[cfg(feature = "app-relations")]
 #[derive(Deserialize)]
+#[doc(hidden)]
 struct RawUserRelations {
     pub servers: Option<FractalList<Server>>,
 }
@@ -73,6 +80,7 @@ impl Into<UserRelations> for RawUserRelations {
 }
 
 #[cfg(feature = "app-relations")]
+#[doc(hidden)]
 struct RelationVisitor;
 
 #[cfg(feature = "app-relations")]
@@ -94,6 +102,7 @@ impl<'de> Visitor<'de> for RelationVisitor {
     }
 }
 
+/// Represents the relationship objects for a user.
 #[cfg(feature = "app-relations")]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct UserRelations {
@@ -110,6 +119,7 @@ impl<'de> Deserialize<'de> for UserRelations {
     }
 }
 
+/// Represents a server subuser object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SubUser {
     pub id: i32,
