@@ -56,11 +56,13 @@ impl User {
     }
 }
 
+#[cfg(feature = "app-relations")]
 #[derive(Deserialize)]
 struct RawUserRelations {
     pub servers: Option<FractalList<Server>>,
 }
 
+#[cfg(feature = "app-relations")]
 impl Into<UserRelations> for RawUserRelations {
     fn into(self) -> UserRelations {
         UserRelations {
@@ -72,8 +74,10 @@ impl Into<UserRelations> for RawUserRelations {
     }
 }
 
+#[cfg(feature = "app-relations")]
 struct RelationVisitor;
 
+#[cfg(feature = "app-relations")]
 impl<'de> Visitor<'de> for RelationVisitor {
     type Value = UserRelations;
 
@@ -98,6 +102,7 @@ pub struct UserRelations {
     pub servers: Option<Vec<Server>>,
 }
 
+#[cfg(feature = "app-relations")]
 impl<'de> Deserialize<'de> for UserRelations {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
