@@ -4,14 +4,14 @@ use serde::{Deserialize, Serialize};
 pub mod application;
 #[cfg(feature = "fractal")]
 pub mod fractal;
-#[cfg(feature = "time")]
-pub mod time;
+#[cfg(any(feature = "time", feature = "util"))]
+pub mod util;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FeatureLimits {
-    allocations: u32,
-    backups: u32,
-    databases: u32,
+    allocations: i32,
+    backups: i32,
+    databases: i32,
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]

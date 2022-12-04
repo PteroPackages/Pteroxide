@@ -1,10 +1,8 @@
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "time")]
-use time::Time;
 
-#[cfg(feature = "time")]
-use crate::time as util;
 use crate::{FeatureLimits, Limits};
+#[cfg(feature = "time")]
+use crate::util::{self, Time};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Container {

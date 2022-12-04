@@ -3,13 +3,11 @@ use serde::{
     Deserialize, Serialize,
 };
 use std::fmt::{Formatter, Result as FmtResult};
-#[cfg(feature = "time")]
-use time::Time;
 
 use super::Server;
 use crate::fractal::FractalList;
 #[cfg(feature = "time")]
-use crate::time as util;
+use crate::util::{self, Time};
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct User {
