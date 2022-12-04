@@ -1,6 +1,6 @@
 use serde::{
-    de::{Error, MapAccess, Visitor},
-    Deserialize, Deserializer, Serialize,
+    de::{value::MapAccessDeserializer, MapAccess, Visitor},
+    Deserialize, Serialize,
 };
 use std::fmt::{Formatter, Result as FmtResult};
 #[cfg(feature = "time")]
@@ -56,6 +56,42 @@ impl User {
     }
 }
 
+#[derive(Deserialize)]
+struct RawUserRelations {
+    pub servers: Option<FractalList<Server>>,
+}
+
+impl Into<UserRelations> for RawUserRelations {
+    fn into(self) -> UserRelations {
+        UserRelations {
+            servers: match self.servers {
+                Some(v) => Some(v.data.iter().map(|s| s.attributes.clone()).collect()),
+                None => None,
+            },
+        }
+    }
+}
+
+struct RelationVisitor;
+
+impl<'de> Visitor<'de> for RelationVisitor {
+    type Value = UserRelations;
+
+    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+        formatter.write_str("a map of user relationships")
+    }
+
+    fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
+    where
+        A: MapAccess<'de>,
+    {
+        let des = MapAccessDeserializer::new(map);
+        let rel = RawUserRelations::deserialize(des)?;
+
+        Ok(rel.into())
+    }
+}
+
 #[cfg(feature = "app-relations")]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct UserRelations {
@@ -65,45 +101,9 @@ pub struct UserRelations {
 impl<'de> Deserialize<'de> for UserRelations {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
-        D: Deserializer<'de>,
+        D: serde::Deserializer<'de>,
     {
-        #[derive(Deserialize)]
-        struct RawUserRelations {
-            servers: Option<FractalList<Server>>,
-        }
-
-        struct RelationVisitor;
-
-        impl<'de> Visitor<'de> for RelationVisitor {
-            type Value = RawUserRelations;
-
-            fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-                formatter.write_str("struct RawUserRelations")
-            }
-
-            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
-            where
-                A: MapAccess<'de>,
-            {
-                if let Some(key) = map.next_key::<&str>()? {
-                    if key == "servers" {
-                        return map.next_value();
-                    }
-                }
-
-                Err(Error::missing_field("servers"))
-            }
-        }
-
-        let res =
-            deserializer.deserialize_struct("RawUserRelations", &["servers"], RelationVisitor)?;
-
-        Ok(Self {
-            servers: match res.servers {
-                Some(v) => Some(v.data.iter().map(|s| s.attributes.clone()).collect()),
-                None => None,
-            },
-        })
+        deserializer.deserialize_map(RelationVisitor)
     }
 }
 
