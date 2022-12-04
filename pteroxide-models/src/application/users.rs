@@ -1,4 +1,8 @@
-use serde::{Deserialize, Serialize};
+use serde::{
+    de::{Error, MapAccess, Visitor},
+    Deserialize, Deserializer, Serialize,
+};
+use std::fmt::{Formatter, Result as FmtResult};
 #[cfg(feature = "time")]
 use time::Time;
 
@@ -52,9 +56,55 @@ impl User {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq)]
+#[cfg(feature = "app-relations")]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct UserRelations {
-    pub servers: Option<FractalList<Server>>,
+    pub servers: Option<Vec<Server>>,
+}
+
+impl<'de> Deserialize<'de> for UserRelations {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        struct RawUserRelations {
+            servers: Option<FractalList<Server>>,
+        }
+
+        struct RelationVisitor;
+
+        impl<'de> Visitor<'de> for RelationVisitor {
+            type Value = RawUserRelations;
+
+            fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                formatter.write_str("struct RawUserRelations")
+            }
+
+            fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+            where
+                A: MapAccess<'de>,
+            {
+                if let Some(key) = map.next_key::<&str>()? {
+                    if key == "servers" {
+                        return map.next_value();
+                    }
+                }
+
+                Err(Error::missing_field("servers"))
+            }
+        }
+
+        let res =
+            deserializer.deserialize_struct("RawUserRelations", &["servers"], RelationVisitor)?;
+
+        Ok(Self {
+            servers: match res.servers {
+                Some(v) => Some(v.data.iter().map(|s| s.attributes.clone()).collect()),
+                None => None,
+            },
+        })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
