@@ -1,6 +1,9 @@
-use pteroxide_models::{application::User, fractal::{FractalItem, FractalList}};
+use pteroxide_models::{
+    application::User,
+    fractal::{FractalItem, FractalList},
+};
 
-use crate::{routing::application::Route, Application, Builder, Error};
+use crate::{routing::Application as Route, Application, Builder, Error};
 
 #[derive(Debug)]
 pub struct GetUsers<'a> {
@@ -11,11 +14,14 @@ pub struct GetUsers<'a> {
 impl<'a> GetUsers<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application) -> Self {
-        Self { app, with_servers: false }
+        Self {
+            app,
+            with_servers: false,
+        }
     }
 
     /// Include the [`Server`]s the user has access to in the user [`relationships`].
-    /// 
+    ///
     /// [`relationships`]: pteroxide_models::application::UserRelations
     /// [`Server`]: pteroxide_models::application::Server
     pub fn with_servers(mut self, value: bool) -> Self {
@@ -25,20 +31,17 @@ impl<'a> GetUsers<'a> {
     }
 
     /// Asynchronously executes the request and returns a list of [`User`] objects.
-    /// 
+    ///
     /// ## Errors
-    /// 
+    ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<User>, Error> {
-        let mut builder = Builder::default().route(Route::GetUsers);
+        let mut builder = Builder::default().route(Route::GetUsers.into());
         if self.with_servers {
             builder = builder.param("include", "servers");
         }
 
-        let res = self
-            .app
-            .request::<FractalList<User>>(builder)
-            .await?;
+        let res = self.app.request::<FractalList<User>>(builder).await?;
 
         Ok(res.data.iter().map(|u| u.attributes.clone()).collect())
     }
@@ -54,11 +57,15 @@ pub struct GetUser<'a> {
 impl<'a> GetUser<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application, id: i32) -> Self {
-        Self { app, id, with_servers: false }
+        Self {
+            app,
+            id,
+            with_servers: false,
+        }
     }
 
     /// Include the [`Server`]s the user has access to in the user [`relationships`].
-    /// 
+    ///
     /// [`relationships`]: pteroxide_models::application::UserRelations
     /// [`Server`]: pteroxide_models::application::Server
     pub fn with_servers(mut self, value: bool) -> Self {
@@ -68,20 +75,17 @@ impl<'a> GetUser<'a> {
     }
 
     /// Asynchronously executes the request and returns a list of [`User`] objects.
-    /// 
+    ///
     /// ## Errors
-    /// 
+    ///
     /// Returns an [`Error`] if the request fails or if the user is not found.
     pub async fn exec(&self) -> Result<User, Error> {
-        let mut builder = Builder::default().route(Route::GetUser { id: self.id });
+        let mut builder = Builder::default().route(Route::GetUser { id: self.id }.into());
         if self.with_servers {
             builder = builder.param("include", "servers");
         }
 
-        let res = self
-            .app
-            .request::<FractalItem<User>>(builder)
-            .await?;
+        let res = self.app.request::<FractalItem<User>>(builder).await?;
 
         Ok(res.attributes)
     }

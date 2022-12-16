@@ -38,17 +38,17 @@ impl Application {
 
     /// Performs an API request using the [`Builder`] with the set fields. Returns a result with
     /// the deserialized API response, if any.
-    /// 
+    ///
     /// ## Example
-    /// 
+    ///
     /// ```no_run
     /// let builder = Builder::default().route(Route::GetUser { id: 2 });
     /// let data = app.request::<FractalItem<User>>(builder).await?;
     /// println!("{:#?}", data.attributes);
     /// ```
-    /// 
+    ///
     /// ## Errors
-    /// 
+    ///
     /// Returns an [`Error`] if the request fails or if the response fails to be deserialized.
     pub async fn request<T>(&self, builder: Builder<'_>) -> Result<T, Error>
     where
@@ -86,14 +86,14 @@ impl Application {
     }
 
     /// Returns a request builder for getting a list of [`User`]s.
-    /// 
+    ///
     /// [`User`]: pteroxide_models::application::User
     pub const fn get_users(&self) -> GetUsers<'_> {
         GetUsers::new(self)
     }
 
     /// Returns a request builder for getting a specified [`User`].
-    /// 
+    ///
     /// [`User`]: pteroxide_models::application::User
     pub const fn get_user(&self, id: i32) -> GetUser<'_> {
         GetUser::new(self, id)

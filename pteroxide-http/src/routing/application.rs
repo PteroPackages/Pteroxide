@@ -1,25 +1,34 @@
 use hyper::Method;
 
-/// Route members implementation for the application API.
-pub enum Route {
+use super::Route;
+
+#[derive(Debug)]
+pub enum Application {
     GetUsers,
     GetUser { id: i32 },
 }
 
-impl Route {
+impl Application {
     /// Returns the corresponding method for the current route.
-    pub const fn method(&self) -> Method {
+    pub fn method(&self) -> Method {
         match self {
-            Route::GetUsers | Route::GetUser { .. } => Method::GET,
+            Application::GetUsers | Application::GetUser { .. } => Method::GET,
         }
     }
 }
 
-impl ToString for Route {
+impl ToString for Application {
     fn to_string(&self) -> String {
         match self {
-            Route::GetUsers => String::from("/api/application/users"),
-            Route::GetUser { id } => format!("/api/application/users/{}", id),
+            Application::GetUsers => String::from("/api/application/users"),
+            Application::GetUser { id } => format!("/api/application/users/{}", id),
         }
+    }
+}
+
+#[allow(clippy::from_over_into)]
+impl Into<Route> for Application {
+    fn into(self) -> Route {
+        Route::Application(self)
     }
 }
