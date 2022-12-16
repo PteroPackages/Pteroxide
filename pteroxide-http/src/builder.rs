@@ -1,4 +1,6 @@
 use hyper::{header::HeaderValue, Body, Method};
+use serde::Serialize;
+use serde_json::json;
 use urlencoding::encode;
 
 use super::routing::Route;
@@ -94,6 +96,32 @@ impl<'a> Builder<'a> {
         Body: From<T>,
     {
         self.body = Body::from(body);
+
+        self
+    }
+
+    // TODO: change this
+
+    /// Sets the request [`Body`] to the given value and returns the builder. Defaults to empty.
+    ///
+    /// ## Example
+    ///
+    /// ```no_run
+    /// let builder = Builder::default()
+    ///     .route(Route::CreateUser)
+    ///     .body(json!({
+    ///         "username": "test",
+    ///         "email": "test@example.com",
+    ///         "first_name": "test",
+    ///         "last_name": "example"
+    ///     }));
+    /// ```
+    pub fn json<T>(mut self, body: T) -> Self
+    where
+        T: Serialize,
+    {
+        let value = json!(body);
+        self.body = Body::from(value.to_string());
 
         self
     }
