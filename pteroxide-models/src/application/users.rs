@@ -67,6 +67,7 @@ struct RawUserRelations {
     pub servers: Option<FractalList<Server>>,
 }
 
+#[allow(clippy::from_over_into)]
 #[cfg(feature = "app-relations")]
 impl Into<UserRelations> for RawUserRelations {
     fn into(self) -> UserRelations {
