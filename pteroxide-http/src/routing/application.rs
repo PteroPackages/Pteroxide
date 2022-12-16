@@ -6,6 +6,7 @@ use super::Route;
 pub enum Application {
     GetUsers,
     GetUser { id: i32 },
+    CreateUser,
 }
 
 impl Application {
@@ -13,6 +14,7 @@ impl Application {
     pub fn method(&self) -> Method {
         match self {
             Application::GetUsers | Application::GetUser { .. } => Method::GET,
+            Application::CreateUser => Method::POST,
         }
     }
 }
@@ -20,7 +22,9 @@ impl Application {
 impl ToString for Application {
     fn to_string(&self) -> String {
         match self {
-            Application::GetUsers => String::from("/api/application/users"),
+            Application::GetUsers | Application::CreateUser => {
+                String::from("/api/application/users")
+            }
             Application::GetUser { id } => format!("/api/application/users/{}", id),
         }
     }
