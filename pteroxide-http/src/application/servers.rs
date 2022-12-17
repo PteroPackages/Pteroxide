@@ -5,12 +5,22 @@ use crate::{routing::Application as Route, Application, Builder, Error};
 #[derive(Debug)]
 pub struct GetServers<'a> {
     app: &'a Application,
+    with_owner: bool,
 }
 
 impl<'a> GetServers<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application) -> Self {
-        Self { app }
+        Self { app, with_owner: false }
+    }
+
+    /// Include the server [`owner`] in the server [`relationships`].
+    /// 
+    /// [`owner`]: pteroxide_models::application::User
+    pub fn with_owner(mut self, value: bool) -> Self {
+        self.with_owner = value;
+
+        self
     }
 
     /// Asynchronously executes the request and returns a list of [`Server`] objects.
@@ -19,10 +29,14 @@ impl<'a> GetServers<'a> {
     ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<Server>, Error> {
-        let res = self
-            .app
-            .request::<FractalList<Server>>(Builder::default().route(Route::GetServers.into()))
-            .await?;
+        let mut builder = Builder::default()
+            .route(Route::GetServers.into());
+
+        if self.with_owner {
+            builder = builder.param("include", "user")
+        }
+
+        let res = self.app.request::<FractalList<Server>>(builder).await?;
 
         Ok(res.data.iter().map(|s| s.attributes.clone()).collect())
     }
