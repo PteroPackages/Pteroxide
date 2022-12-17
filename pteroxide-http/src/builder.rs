@@ -82,14 +82,16 @@ impl<'a> Builder<'a> {
     /// ## Example
     ///
     /// ```no_run
+    /// let value = json!({
+    ///     "username": "test",
+    ///     "email": "test@example.com",
+    ///     "first_name": "test",
+    ///     "last_name": "example"
+    /// });
+    ///
     /// let builder = Builder::default()
     ///     .route(Route::CreateUser)
-    ///     .body(json!({
-    ///         "username": "test",
-    ///         "email": "test@example.com",
-    ///         "first_name": "test",
-    ///         "last_name": "example"
-    ///     }));
+    ///     .body(value.to_string());
     /// ```
     pub fn body<T>(mut self, body: T) -> Self
     where
@@ -100,21 +102,21 @@ impl<'a> Builder<'a> {
         self
     }
 
-    // TODO: change this
-
-    /// Sets the request [`Body`] to the given value and returns the builder. Defaults to empty.
+    /// Sets the request [`Body`] to the JSON representation of the value and returns the builder.
     ///
     /// ## Example
     ///
     /// ```no_run
+    /// let fields = CreateUserFields {
+    ///     username: "test",
+    ///     email: "test@example.com",
+    ///     first_name: "test",
+    ///     last_name: "example",
+    /// }
+    ///
     /// let builder = Builder::default()
     ///     .route(Route::CreateUser)
-    ///     .body(json!({
-    ///         "username": "test",
-    ///         "email": "test@example.com",
-    ///         "first_name": "test",
-    ///         "last_name": "example"
-    ///     }));
+    ///     .json(fields);
     /// ```
     pub fn json<T>(mut self, body: T) -> Self
     where
@@ -153,7 +155,7 @@ impl Default for Builder<'_> {
             method: Default::default(),
             route: Default::default(),
             params: Default::default(),
-            body: Body::empty(),
+            body: Default::default(),
             content_type: HeaderValue::from_str("application/json").unwrap(),
             accept_type: HeaderValue::from_str("application/json").unwrap(),
         }

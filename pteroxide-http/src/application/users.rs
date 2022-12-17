@@ -120,49 +120,68 @@ impl<'a> CreateUser<'a> {
         }
     }
 
-    #[must_use]
+    /// Sets the username for the user.
+    #[must_use = "a user must have a username"]
     pub fn username(mut self, username: &'a str) -> Self {
         self.fields.username = username;
 
         self
     }
 
+    /// Sets the email for the user. Note that this must be unique to the user; duplicate emails
+    /// are not allowed by the panel.
+    #[must_use = "a user must have an email"]
     pub fn email(mut self, email: &'a str) -> Self {
         self.fields.email = email;
 
         self
     }
 
+    /// Sets the external identifier for the user. This is in place for third-party applications
+    /// and is not required (default is [`None`] - unset).
     pub fn external_id(mut self, id: Option<&'a str>) -> Self {
         self.fields.external_id = id;
 
         self
     }
 
+    /// Sets the first name of the user. This is required alongside the `last_name`.
+    #[must_use = "a user must have a first name"]
     pub fn first_name(mut self, name: &'a str) -> Self {
         self.fields.first_name = name;
 
         self
     }
 
+    /// Sets the last name of the user. This is required alongside the `first_name`.
+    #[must_use = "a user must have a last name"]
     pub fn last_name(mut self, name: &'a str) -> Self {
         self.fields.last_name = name;
 
         self
     }
 
+    /// Sets the root admin status of the user. By default this is [`None`] - false.
     pub fn root_admin(mut self, value: bool) -> Self {
         self.fields.root_admin = value;
 
         self
     }
 
+    /// Sets the password for the user. By default this is [`None`] - unset. If no password is set,
+    /// the user will be prompted to set one upon logging in via a web interface. If a password is
+    /// set, it cannot be accessed or viewed anywhere - be careful how you manage your passwords.
     pub fn password(mut self, password: Option<&'a str>) -> Self {
         self.fields.password = password;
 
         self
     }
 
+    /// Asynchronously executes the request and returns the new [`User`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(self) -> Result<User, Error> {
         let builder = Builder::default()
             .route(Route::CreateUser.into())
@@ -202,48 +221,62 @@ impl<'a> UpdateUser<'a> {
         }
     }
 
+    /// Sets the username for the user, otherwise defaults to the existing one.
     pub fn username(mut self, username: &'a str) -> Self {
         self.fields.username = username;
 
         self
     }
 
+    /// Sets the email for the user, otherwise defaults to the existing one.
     pub fn email(mut self, email: &'a str) -> Self {
         self.fields.email = email;
 
         self
     }
 
+    /// Sets the external identifier for the user, otherwise defaults to the existing one. Make
+    /// sure to also update any third-party services using this external identifier if changed.
     pub fn external_id(mut self, id: Option<&'a str>) -> Self {
         self.fields.external_id = id;
 
         self
     }
 
+    /// Sets the first name for the user, otherwise defaults to the existing one.
     pub fn first_name(mut self, name: &'a str) -> Self {
         self.fields.first_name = name;
 
         self
     }
 
+    /// Sets the last name for the user, otherwise defaults to the existing one.
     pub fn last_name(mut self, name: &'a str) -> Self {
         self.fields.last_name = name;
 
         self
     }
 
+    /// Sets the root admin status of the user, otherwise defaults to the current status.
     pub fn root_admin(mut self, value: bool) -> Self {
         self.fields.root_admin = Some(value);
 
         self
     }
 
+    /// Sets the password for the user. This will always override the existing password as there
+    /// is no way to get the current one from the panel.
     pub fn password(mut self, password: Option<&'a str>) -> Self {
         self.fields.password = password;
 
         self
     }
 
+    /// Asynchronously executes the request and returns the updated [`User`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(mut self) -> Result<User, Error> {
         let user = GetUser::new(self.app, self.id).exec().await?;
 
@@ -263,7 +296,6 @@ impl<'a> UpdateUser<'a> {
             self.fields.root_admin = Some(user.root_admin)
         }
 
-        // wtf...
         self.fields.external_id = self.fields.external_id.or(user.external_id.as_deref());
 
         let builder = Builder::default()
@@ -287,6 +319,11 @@ impl<'a> DeleteUser<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or if the user is not found.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::default().route(Route::DeleteUser { id: self.id }.into()))
