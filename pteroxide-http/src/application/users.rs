@@ -275,3 +275,21 @@ impl<'a> UpdateUser<'a> {
         Ok(new.attributes)
     }
 }
+
+pub struct DeleteUser<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> DeleteUser<'a> {
+    #[doc(hidden)]
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::default().route(Route::DeleteUser { id: self.id }.into()))
+            .await
+    }
+}
