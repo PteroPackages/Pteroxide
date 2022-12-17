@@ -8,7 +8,7 @@ use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 
-use self::users::{CreateUser, GetUser, GetUsers};
+use self::users::{CreateUser, GetUser, GetUsers, UpdateUser};
 use super::{Builder, Error};
 
 pub mod users;
@@ -104,5 +104,9 @@ impl Application {
     /// [`User`]: pteroxide_models::application::User
     pub fn create_user(&self) -> CreateUser<'_> {
         CreateUser::new(self)
+    }
+
+    pub fn update_user(&self, id: i32) -> UpdateUser<'_> {
+        UpdateUser::new(self, id)
     }
 }

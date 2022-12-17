@@ -7,6 +7,7 @@ pub enum Application {
     GetUsers,
     GetUser { id: i32 },
     CreateUser,
+    UpdateUser { id: i32 },
 }
 
 impl Application {
@@ -15,6 +16,7 @@ impl Application {
         match self {
             Application::GetUsers | Application::GetUser { .. } => Method::GET,
             Application::CreateUser => Method::POST,
+            Application::UpdateUser { .. } => Method::PATCH,
         }
     }
 }
@@ -25,7 +27,9 @@ impl ToString for Application {
             Application::GetUsers | Application::CreateUser => {
                 String::from("/api/application/users")
             }
-            Application::GetUser { id } => format!("/api/application/users/{}", id),
+            Application::GetUser { id } | Application::UpdateUser { id } => {
+                format!("/api/application/users/{}", id)
+            }
         }
     }
 }

@@ -120,6 +120,7 @@ impl<'a> CreateUser<'a> {
         }
     }
 
+    #[must_use]
     pub fn username(mut self, username: &'a str) -> Self {
         self.fields.username = username;
 
@@ -170,5 +171,107 @@ impl<'a> CreateUser<'a> {
         let res = self.app.request::<FractalItem<User>>(builder).await?;
 
         Ok(res.attributes)
+    }
+}
+
+#[derive(Debug, Default, Serialize)]
+struct UpdateUserFields<'a> {
+    pub username: &'a str,
+    pub email: &'a str,
+    pub external_id: Option<&'a str>,
+    pub first_name: &'a str,
+    pub last_name: &'a str,
+    pub root_admin: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub password: Option<&'a str>,
+}
+
+pub struct UpdateUser<'a> {
+    app: &'a Application,
+    id: i32,
+    fields: UpdateUserFields<'a>,
+}
+
+impl<'a> UpdateUser<'a> {
+    #[doc(hidden)]
+    pub fn new(app: &'a Application, id: i32) -> Self {
+        Self {
+            app,
+            id,
+            fields: Default::default(),
+        }
+    }
+
+    pub fn username(mut self, username: &'a str) -> Self {
+        self.fields.username = username;
+
+        self
+    }
+
+    pub fn email(mut self, email: &'a str) -> Self {
+        self.fields.email = email;
+
+        self
+    }
+
+    pub fn external_id(mut self, id: Option<&'a str>) -> Self {
+        self.fields.external_id = id;
+
+        self
+    }
+
+    pub fn first_name(mut self, name: &'a str) -> Self {
+        self.fields.first_name = name;
+
+        self
+    }
+
+    pub fn last_name(mut self, name: &'a str) -> Self {
+        self.fields.last_name = name;
+
+        self
+    }
+
+    pub fn root_admin(mut self, value: bool) -> Self {
+        self.fields.root_admin = Some(value);
+
+        self
+    }
+
+    pub fn password(mut self, password: Option<&'a str>) -> Self {
+        self.fields.password = password;
+
+        self
+    }
+
+    pub async fn exec(mut self) -> Result<User, Error> {
+        let user = GetUser::new(self.app, self.id).exec().await?;
+
+        if self.fields.username.is_empty() {
+            self.fields.username = &user.username
+        }
+        if self.fields.email.is_empty() {
+            self.fields.email = &user.email
+        }
+        if self.fields.first_name.is_empty() {
+            self.fields.first_name = &user.first_name
+        }
+        if self.fields.last_name.is_empty() {
+            self.fields.last_name = &user.last_name
+        }
+        if self.fields.root_admin.is_none() {
+            self.fields.root_admin = Some(user.root_admin)
+        }
+
+        // wtf...
+        self.fields.external_id = self.fields.external_id.or(user.external_id.as_deref());
+
+        let builder = Builder::default()
+            .route(Route::UpdateUser { id: self.id }.into())
+            .json(self.fields);
+
+        let new = self.app.request::<FractalItem<User>>(builder).await?;
+
+        Ok(new.attributes)
     }
 }
