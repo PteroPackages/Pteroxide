@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "app-relations")]
+use super::relations::ServerRelations;
 #[cfg(feature = "time")]
 use crate::util::{self, Time};
 use crate::{FeatureLimits, Limits};
@@ -38,6 +40,10 @@ pub struct Server {
     pub container: Container,
     pub created_at: String,
     pub updated_at: Option<String>,
+    #[cfg(feature = "app-relations")]
+    #[serde(default)]
+    #[serde(skip_serializing)]
+    pub relationships: Option<ServerRelations>,
 }
 
 #[cfg(feature = "time")]

@@ -4,8 +4,8 @@ use serde::{
 };
 use std::fmt::{Formatter, Result as FmtResult};
 
-use super::Server;
-use crate::fractal::FractalList;
+use super::{Server, User};
+use crate::fractal::{FractalItem, FractalList};
 
 #[derive(Deserialize)]
 #[doc(hidden)]
@@ -14,9 +14,9 @@ struct RawUserRelations {
 }
 
 #[doc(hidden)]
-struct RelationVisitor;
+struct UserRelationVisitor;
 
-impl<'de> Visitor<'de> for RelationVisitor {
+impl<'de> Visitor<'de> for UserRelationVisitor {
     type Value = UserRelations;
 
     fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
@@ -50,6 +50,53 @@ impl<'de> Deserialize<'de> for UserRelations {
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_map(RelationVisitor)
+        deserializer.deserialize_map(UserRelationVisitor)
+    }
+}
+
+#[derive(Deserialize)]
+#[doc(hidden)]
+struct RawServerRelations {
+    user: Option<FractalItem<User>>,
+}
+
+#[doc(hidden)]
+struct ServerRelationVisitor;
+
+impl<'de> Visitor<'de> for ServerRelationVisitor {
+    type Value = ServerRelations;
+
+    fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+        formatter.write_str("a map of server relationships")
+    }
+
+    fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
+    where
+        A: MapAccess<'de>,
+    {
+        let des = MapAccessDeserializer::new(map);
+        let rel = RawServerRelations::deserialize(des)?;
+
+        Ok(ServerRelations {
+            user: match rel.user {
+                Some(u) => Some(u.attributes),
+                None => None,
+            },
+        })
+    }
+}
+
+/// Represents the relationship objects for a server.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ServerRelations {
+    pub user: Option<User>,
+}
+
+impl<'de> Deserialize<'de> for ServerRelations {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        deserializer.deserialize_map(ServerRelationVisitor)
     }
 }
