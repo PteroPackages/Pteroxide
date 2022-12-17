@@ -8,9 +8,11 @@ use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 
+use self::servers::GetServers;
 use self::users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser};
 use super::{Builder, Error};
 
+pub mod servers;
 pub mod users;
 
 /// The main interface for interacting with the application API.
@@ -106,11 +108,24 @@ impl Application {
         CreateUser::new(self)
     }
 
+    /// Returns a request builder for updating a [`User`].
+    /// 
+    /// [`User`]: pteroxide_models::application::User
     pub fn update_user(&self, id: i32) -> UpdateUser<'_> {
         UpdateUser::new(self, id)
     }
 
+    /// Returns a request builder for deleting a [`User`].
+    /// 
+    /// [`User`]: pteroxide_models::application::User
     pub const fn delete_user(&self, id: i32) -> DeleteUser<'_> {
         DeleteUser::new(self, id)
+    }
+
+    /// Returns a request builder for getting a list of [`Server`]s.
+    /// 
+    /// [`Server`]: pteroxide_models::application::Server
+    pub const fn get_servers(&self) -> GetServers<'_> {
+        GetServers::new(self)
     }
 }
