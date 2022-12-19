@@ -48,7 +48,7 @@ impl Application {
     /// ## Example
     ///
     /// ```no_run
-    /// let builder = Builder::default().route(Route::GetUser { id: 2 });
+    /// let builder = Builder::new(Route::GetUser { id: 2 });
     /// let data = app.request::<FractalItem<User>>(builder).await?;
     /// println!("{:#?}", data.attributes);
     /// ```
@@ -63,7 +63,7 @@ impl Application {
         let req = Request::builder()
             .uri(builder.uri(self.url.clone())) // problematic
             .method(builder.method)
-            .header(USER_AGENT, "Pteroxide HTTP Client")
+            .header(USER_AGENT, "Pteroxide HTTP Application")
             .header(AUTHORIZATION, self.key.clone())
             .header(CONTENT_TYPE, builder.content_type)
             .header(ACCEPT, builder.accept_type)
@@ -134,26 +134,44 @@ impl Application {
         GetServers::new(self)
     }
 
+    /// Returns a request builder for getting a specified [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub const fn get_server(&self, id: i32) -> GetServer<'_> {
         GetServer::new(self, id)
     }
 
+    /// Returns a request builder for creating a [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub fn create_server(&self) -> CreateServer<'_> {
         CreateServer::new(self)
     }
 
+    /// Returns a request builder for suspending a [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub const fn suspend_server(&self, id: i32) -> SuspendServer<'_> {
         SuspendServer::new(self, id)
     }
 
+    /// Returns a request builder for unsuspending a [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub const fn unsuspend_server(&self, id: i32) -> UnsuspendServer<'_> {
         UnsuspendServer::new(self, id)
     }
 
+    /// Returns a request builder for triggering the reinstall process of a [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub const fn reinstall_server(&self, id: i32) -> ReinstallServer<'_> {
         ReinstallServer::new(self, id)
     }
 
+    /// Returns a request builder for deleting a [`Server`].
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
     pub const fn delete_server(&self, id: i32) -> DeleteServer<'_> {
         DeleteServer::new(self, id)
     }

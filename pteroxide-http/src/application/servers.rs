@@ -204,78 +204,103 @@ impl<'a> CreateServer<'a> {
         }
     }
 
+    /// Sets the name of the server.
+    #[must_use = "a server must have a name"]
     pub fn name(mut self, name: &'a str) -> Self {
         self.fields.name = name;
 
         self
     }
 
+    /// Sets the description for a server, taking an [`Option`] which defaults to [`None`] to
+    /// leave it unset.
     pub fn description(mut self, desc: Option<&'a str>) -> Self {
         self.fields.description = desc;
 
         self
     }
 
+    /// Sets the external identifier for the server. Default is [`None`] - unset.
     pub fn external_id(mut self, id: Option<&'a str>) -> Self {
         self.fields.external_id = id;
 
         self
     }
 
+    /// Sets the owner for the server.
+    #[must_use = "a server must have an owner"]
     pub fn owner(mut self, id: i32) -> Self {
         self.fields.user = id;
 
         self
     }
 
+    /// Sets the egg to use for the server.
+    #[must_use = "a server is bound to an egg"]
     pub fn egg(mut self, id: i32) -> Self {
         self.fields.egg = id;
 
         self
     }
 
+    /// Sets the docker image for the server.
+    #[must_use = "a docker image is required for a server"]
     pub fn docker_image(mut self, image: &'a str) -> Self {
         self.fields.docker_image = image;
 
         self
     }
 
+    /// Sets the startup command for the server.
+    #[must_use = "a startup command is required for a server"]
     pub fn startup(mut self, command: &'a str) -> Self {
         self.fields.startup = command;
 
         self
     }
 
+    /// Sets an environment variable for the server. This is required with certain eggs.
     pub fn env_variable(mut self, name: &'a str, value: Value) -> Self {
         self.fields.environment.insert(name, value);
 
         self
     }
 
+    /// Whether the server should skip the egg installation script during the installation process.
+    /// Defaults to `false`.
     pub fn skip_scripts(mut self, value: bool) -> Self {
         self.fields.skip_scripts = value;
 
         self
     }
 
+    /// Sets the status of the OOM killer for the server. Default is `false` (enabled).
     pub fn oom_disabled(mut self, value: bool) -> Self {
         self.fields.oom_disabled = value;
 
         self
     }
 
+    /// Sets the limits for the server, including the memory, disk, and other docker configuration
+    /// options.
+    #[must_use = "limits are required for a server"]
     pub fn limits(mut self, data: Limits) -> Self {
         self.fields.limits = data;
 
         self
     }
 
+    /// Sets the feature limits for the server.
+    #[must_use = "feature limits are required for a server"]
     pub fn feature_limits(mut self, data: FeatureLimits) -> Self {
         self.fields.feature_limits = data;
 
         self
     }
 
+    /// Sets the allocation data for the server, including the default allocation and any
+    /// additional allocations. Defaults to [`None`] - unset. You must set either the allocation
+    /// data or the deployment data for the server to be created.
     pub fn allocation(mut self, default: i32, additional: &'a [i32]) -> Self {
         self.fields.allocation = Some(AllocationData {
             default,
@@ -285,6 +310,8 @@ impl<'a> CreateServer<'a> {
         self
     }
 
+    /// Sets the deployment options for the server. This will override the allocation data if set.
+    /// Defaults to [`None`] - unset.
     pub fn deploy(
         mut self,
         locations: &'a [i32],
@@ -300,12 +327,19 @@ impl<'a> CreateServer<'a> {
         self
     }
 
+    /// Whether the server should start once the install process has been completed. Defaults to
+    /// `false`.
     pub fn start_on_completion(mut self, value: bool) -> Self {
         self.fields.start_on_completion = value;
 
         self
     }
 
+    /// Asynchronously executes the request and returns the new [`Server`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(mut self) -> Result<Server, Error> {
         if self.fields.allocation.is_some() && self.fields.deploy.is_some() {
             self.fields.allocation = None;
@@ -331,6 +365,11 @@ impl<'a> SuspendServer<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or the server is in conflict.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(Route::SuspendServer { id: self.id }.into()))
@@ -350,6 +389,11 @@ impl<'a> UnsuspendServer<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or the server is in conflict.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(Route::UnsuspendServer { id: self.id }.into()))
@@ -369,6 +413,11 @@ impl<'a> ReinstallServer<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or the server is in conflict.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(Route::ReinstallServer { id: self.id }.into()))
@@ -393,12 +442,19 @@ impl<'a> DeleteServer<'a> {
         }
     }
 
+    /// Whether the server should be deleted by force instead of a gracious deletion. Defaults to
+    /// `false`.
     pub fn force(mut self, value: bool) -> Self {
         self.force = value;
 
         self
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or the server is not found.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(
