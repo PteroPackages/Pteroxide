@@ -28,6 +28,7 @@ pub struct Server {
     pub identifier: String,
     pub name: String,
     pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<Status>,
     pub suspended: bool,
     pub limits: Limits,
@@ -77,6 +78,7 @@ impl Server {
 
 /// Represents the status of a [`Server`] in the panel.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Status {
     Installing,
     InstallFailed,
