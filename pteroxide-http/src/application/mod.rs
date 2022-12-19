@@ -57,7 +57,7 @@ impl Application {
         for<'de> T: Deserialize<'de>,
     {
         let req = Request::builder()
-            .uri(builder.uri(self.url.clone()))
+            .uri(builder.uri(self.url.clone())) // problematic
             .method(builder.method)
             .header(USER_AGENT, "Pteroxide HTTP Client")
             .header(AUTHORIZATION, self.key.clone())

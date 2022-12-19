@@ -10,6 +10,7 @@ pub struct Builder<'a> {
     pub(crate) method: Method,
     pub(crate) route: String,
     pub(crate) params: Vec<(&'a str, &'a str)>,
+    pub(crate) include: Vec<&'a str>,
     pub(crate) body: Body,
     pub(crate) content_type: HeaderValue,
     pub(crate) accept_type: HeaderValue,
@@ -26,18 +27,22 @@ impl<'a> Builder<'a> {
     }
 
     /// Builds a URI from the route and params set in the builder.
-    pub fn uri(&self, domain: String) -> String {
+    pub fn uri(self, domain: String) -> String {
         let url = format!("{}{}", domain, self.route);
+        let mut params = self.params.clone();
 
-        if self.params.is_empty() {
+        if !self.include.is_empty() {
+            params.push(("include", &self.include.clone().join(",")));
+        }
+
+        if params.is_empty() {
             return url;
         }
 
-        let mut query = format!("?{}={}", self.params[0].0, self.params[0].1);
+        let mut query = format!("?{}={}", params[0].0, params[0].1);
 
-        if self.params.len() > 1 {
-            let parts: Vec<String> = self
-                .params
+        if params.len() > 1 {
+            let parts: Vec<String> = params
                 .iter()
                 .skip(1)
                 .map(|(k, v)| format!("&{}={}", k, encode(v)))
@@ -73,6 +78,12 @@ impl<'a> Builder<'a> {
     /// ```
     pub fn param(mut self, key: &'a str, value: &'a str) -> Self {
         self.params.push((key, value));
+
+        self
+    }
+
+    pub fn include(mut self, value: &'a str) -> Self {
+        self.include.push(value);
 
         self
     }
@@ -155,6 +166,7 @@ impl Default for Builder<'_> {
             method: Default::default(),
             route: Default::default(),
             params: Default::default(),
+            include: Default::default(),
             body: Default::default(),
             content_type: HeaderValue::from_str("application/json").unwrap(),
             accept_type: HeaderValue::from_str("application/json").unwrap(),
