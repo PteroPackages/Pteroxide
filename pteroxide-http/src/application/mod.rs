@@ -7,10 +7,11 @@ use hyper::{
 use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
+use serde_json::{self, Value};
 
-use self::servers::{CreateServer, GetServer, GetServers};
+use self::servers::{CreateServer, GetServer, GetServers, SuspendServer, UnsuspendServer};
 use self::users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser};
-use super::{Builder, Error};
+use super::{error::*, Builder};
 
 pub mod servers;
 pub mod users;
@@ -67,16 +68,17 @@ impl Application {
 
         let res = self.http.request(req).await?;
         match res.status() {
-            StatusCode::OK
-            | StatusCode::CREATED
-            | StatusCode::ACCEPTED
-            | StatusCode::NO_CONTENT => {
+            StatusCode::OK | StatusCode::CREATED | StatusCode::ACCEPTED => {
                 let buf = body::aggregate(res).await?;
                 let data = serde_json::from_reader(buf.reader())
                     .expect("failed to deserialize into model");
 
                 Ok(data)
             }
+            StatusCode::NO_CONTENT => serde_json::from_value(Value::Null).map_err(|_| Error {
+                kind: ErrorKind::DeserializeError,
+                source: None,
+            }),
             _ => {
                 let buf = body::aggregate(res).await?;
                 let data = serde_json::from_reader::<_, FractalError>(buf.reader())
@@ -135,5 +137,13 @@ impl Application {
 
     pub fn create_server(&self) -> CreateServer<'_> {
         CreateServer::new(self)
+    }
+
+    pub const fn suspend_server(&self, id: i32) -> SuspendServer<'_> {
+        SuspendServer::new(self, id)
+    }
+
+    pub const fn unsuspend_server(&self, id: i32) -> UnsuspendServer<'_> {
+        UnsuspendServer::new(self, id)
     }
 }

@@ -12,6 +12,8 @@ pub enum Application {
     GetServers,
     GetServer { id: i32 },
     CreateServer,
+    SuspendServer { id: i32 },
+    UnsuspendServer { id: i32 },
 }
 
 impl Application {
@@ -22,7 +24,10 @@ impl Application {
             | Application::GetUser { .. }
             | Application::GetServers
             | Application::GetServer { .. } => Method::GET,
-            Application::CreateUser | Application::CreateServer => Method::POST,
+            Application::CreateUser
+            | Application::CreateServer
+            | Application::SuspendServer { .. }
+            | Application::UnsuspendServer { .. } => Method::POST,
             Application::UpdateUser { .. } => Method::PATCH,
             Application::DeleteUser { .. } => Method::DELETE,
         }
@@ -44,6 +49,10 @@ impl ToString for Application {
                 String::from("/api/application/servers")
             }
             Application::GetServer { id } => format!("/api/application/servers/{}", id),
+            Application::SuspendServer { id } => format!("/api/application/servers/{}/suspend", id),
+            Application::UnsuspendServer { id } => {
+                format!("/api/application/servers/{}/unsuspend", id)
+            }
         }
     }
 }

@@ -318,3 +318,39 @@ impl<'a> CreateServer<'a> {
         Ok(res.attributes)
     }
 }
+
+#[derive(Debug)]
+pub struct SuspendServer<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> SuspendServer<'a> {
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::new(Route::SuspendServer { id: self.id }.into()))
+            .await
+    }
+}
+
+#[derive(Debug)]
+pub struct UnsuspendServer<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> UnsuspendServer<'a> {
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::new(Route::UnsuspendServer { id: self.id }.into()))
+            .await
+    }
+}
