@@ -326,6 +326,7 @@ pub struct SuspendServer<'a> {
 }
 
 impl<'a> SuspendServer<'a> {
+    #[doc(hidden)]
     pub const fn new(app: &'a Application, id: i32) -> Self {
         Self { app, id }
     }
@@ -344,6 +345,7 @@ pub struct UnsuspendServer<'a> {
 }
 
 impl<'a> UnsuspendServer<'a> {
+    #[doc(hidden)]
     pub const fn new(app: &'a Application, id: i32) -> Self {
         Self { app, id }
     }
@@ -351,6 +353,61 @@ impl<'a> UnsuspendServer<'a> {
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(Route::UnsuspendServer { id: self.id }.into()))
+            .await
+    }
+}
+
+#[derive(Debug)]
+pub struct ReinstallServer<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> ReinstallServer<'a> {
+    #[doc(hidden)]
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::new(Route::ReinstallServer { id: self.id }.into()))
+            .await
+    }
+}
+
+#[derive(Debug)]
+pub struct DeleteServer<'a> {
+    app: &'a Application,
+    id: i32,
+    force: bool,
+}
+
+impl<'a> DeleteServer<'a> {
+    #[doc(hidden)]
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self {
+            app,
+            id,
+            force: false,
+        }
+    }
+
+    pub fn force(mut self, value: bool) -> Self {
+        self.force = value;
+
+        self
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::new(
+                Route::DeleteServer {
+                    id: self.id,
+                    force: self.force,
+                }
+                .into(),
+            ))
             .await
     }
 }

@@ -14,6 +14,8 @@ pub enum Application {
     CreateServer,
     SuspendServer { id: i32 },
     UnsuspendServer { id: i32 },
+    ReinstallServer { id: i32 },
+    DeleteServer { id: i32, force: bool },
 }
 
 impl Application {
@@ -27,9 +29,10 @@ impl Application {
             Application::CreateUser
             | Application::CreateServer
             | Application::SuspendServer { .. }
-            | Application::UnsuspendServer { .. } => Method::POST,
+            | Application::UnsuspendServer { .. }
+            | Application::ReinstallServer { .. } => Method::POST,
             Application::UpdateUser { .. } => Method::PATCH,
-            Application::DeleteUser { .. } => Method::DELETE,
+            Application::DeleteUser { .. } | Application::DeleteServer { .. } => Method::DELETE,
         }
     }
 }
@@ -52,6 +55,16 @@ impl ToString for Application {
             Application::SuspendServer { id } => format!("/api/application/servers/{}/suspend", id),
             Application::UnsuspendServer { id } => {
                 format!("/api/application/servers/{}/unsuspend", id)
+            }
+            Application::ReinstallServer { id } => {
+                format!("/api/application/servers/{}/reinstall", id)
+            }
+            Application::DeleteServer { id, force } => {
+                if *force {
+                    format!("/api/application/servers/{}/force", id)
+                } else {
+                    format!("/api/application/servers/{}", id)
+                }
             }
         }
     }
