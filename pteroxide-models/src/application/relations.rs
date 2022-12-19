@@ -4,7 +4,7 @@ use serde::{
 };
 use std::fmt::{Formatter, Result as FmtResult};
 
-use super::{Server, User};
+use super::{Server, SubUser, User};
 use crate::fractal::{FractalItem, FractalList};
 
 #[derive(Deserialize)]
@@ -58,6 +58,7 @@ impl<'de> Deserialize<'de> for UserRelations {
 #[doc(hidden)]
 struct RawServerRelations {
     user: Option<FractalItem<User>>,
+    subusers: Option<FractalList<SubUser>>,
 }
 
 #[doc(hidden)]
@@ -82,6 +83,10 @@ impl<'de> Visitor<'de> for ServerRelationVisitor {
                 Some(u) => Some(u.attributes),
                 None => None,
             },
+            subusers: match rel.subusers {
+                Some(v) => Some(v.data.iter().map(|u| u.attributes.clone()).collect()),
+                None => None,
+            },
         })
     }
 }
@@ -90,6 +95,7 @@ impl<'de> Visitor<'de> for ServerRelationVisitor {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ServerRelations {
     pub user: Option<User>,
+    pub subusers: Option<Vec<SubUser>>,
 }
 
 impl<'de> Deserialize<'de> for ServerRelations {
