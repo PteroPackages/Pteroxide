@@ -10,13 +10,14 @@ pub enum Application {
     UpdateUser { id: i32 },
     DeleteUser { id: i32 },
     GetServers,
+    GetServer { id: i32 },
 }
 
 impl Application {
     /// Returns the corresponding method for the current route.
     pub fn method(&self) -> Method {
         match self {
-            Application::GetUsers | Application::GetUser { .. } | Application::GetServers => {
+            Application::GetUsers | Application::GetUser { .. } | Application::GetServers | Application::GetServer { .. } => {
                 Method::GET
             }
             Application::CreateUser => Method::POST,
@@ -38,6 +39,7 @@ impl ToString for Application {
                 format!("/api/application/users/{}", id)
             }
             Application::GetServers => String::from("/api/application/servers"),
+            Application::GetServer { id } => format!("/api/application/servers/{}", id),
         }
     }
 }

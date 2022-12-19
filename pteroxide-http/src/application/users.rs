@@ -75,7 +75,7 @@ impl<'a> GetUser<'a> {
         self
     }
 
-    /// Asynchronously executes the request and returns a list of [`User`] objects.
+    /// Asynchronously executes the request and returns a [`User`] object.
     ///
     /// ## Errors
     ///

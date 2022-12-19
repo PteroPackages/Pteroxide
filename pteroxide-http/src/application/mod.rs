@@ -8,7 +8,7 @@ use hyper_tls::HttpsConnector;
 use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 
-use self::servers::GetServers;
+use self::servers::{GetServer, GetServers};
 use self::users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser};
 use super::{Builder, Error};
 
@@ -127,5 +127,9 @@ impl Application {
     /// [`Server`]: pteroxide_models::application::Server
     pub const fn get_servers(&self) -> GetServers<'_> {
         GetServers::new(self)
+    }
+
+    pub const fn get_server(&self, id: i32) -> GetServer<'_> {
+        GetServer::new(self, id)
     }
 }
