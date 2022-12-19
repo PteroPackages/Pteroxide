@@ -17,9 +17,10 @@ impl Application {
     /// Returns the corresponding method for the current route.
     pub fn method(&self) -> Method {
         match self {
-            Application::GetUsers | Application::GetUser { .. } | Application::GetServers | Application::GetServer { .. } => {
-                Method::GET
-            }
+            Application::GetUsers
+            | Application::GetUser { .. }
+            | Application::GetServers
+            | Application::GetServer { .. } => Method::GET,
             Application::CreateUser => Method::POST,
             Application::UpdateUser { .. } => Method::PATCH,
             Application::DeleteUser { .. } => Method::DELETE,

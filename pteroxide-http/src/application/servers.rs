@@ -1,4 +1,7 @@
-use pteroxide_models::{application::Server, fractal::{FractalList, FractalItem}};
+use pteroxide_models::{
+    application::Server,
+    fractal::{FractalItem, FractalList},
+};
 
 use crate::{routing::Application as Route, Application, Builder, Error};
 
