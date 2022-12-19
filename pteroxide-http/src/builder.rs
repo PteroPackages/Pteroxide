@@ -139,8 +139,7 @@ impl Builder {
     where
         T: Serialize,
     {
-        let value = json!(body);
-        self.body = Body::from(value.to_string());
+        self.body = Body::from(json!(body).to_string());
 
         self
     }
