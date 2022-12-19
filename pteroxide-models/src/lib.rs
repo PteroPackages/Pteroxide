@@ -10,9 +10,9 @@ pub mod util;
 /// Represents the feature limits of a server.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FeatureLimits {
-    allocations: i32,
-    backups: i32,
-    databases: i32,
+    pub allocations: i32,
+    pub backups: i32,
+    pub databases: i32,
 }
 
 /// Represents the limits of a server.
