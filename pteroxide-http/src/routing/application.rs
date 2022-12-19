@@ -40,7 +40,9 @@ impl ToString for Application {
             | Application::DeleteUser { id } => {
                 format!("/api/application/users/{}", id)
             }
-            Application::GetServers | Application::CreateServer => String::from("/api/application/servers"),
+            Application::GetServers | Application::CreateServer => {
+                String::from("/api/application/servers")
+            }
             Application::GetServer { id } => format!("/api/application/servers/{}", id),
         }
     }

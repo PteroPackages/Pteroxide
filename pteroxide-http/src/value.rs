@@ -62,8 +62,9 @@ impl From<bool> for Value {
 
 impl Serialize for Value {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
+    where
+        S: serde::Serializer,
+    {
         match self.kind {
             ValueKind::String => serializer.serialize_str(&self.inner),
             ValueKind::Number => serializer.serialize_i64(self.inner.parse::<i64>().unwrap()),

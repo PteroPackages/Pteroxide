@@ -1,6 +1,7 @@
 use pteroxide_models::{
     application::Server,
-    fractal::{FractalItem, FractalList}, Limits, FeatureLimits,
+    fractal::{FractalItem, FractalList},
+    FeatureLimits, Limits,
 };
 use serde::Serialize;
 use std::collections::HashMap;
@@ -197,9 +198,9 @@ impl<'a> CreateServer<'a> {
                     databases: 0,
                 },
                 allocation: None,
-                deploy:  None,
+                deploy: None,
                 start_on_completion: false,
-            }
+            },
         }
     }
 
@@ -284,7 +285,12 @@ impl<'a> CreateServer<'a> {
         self
     }
 
-    pub fn deploy(mut self, locations: &'a [i32], port_range: &'a [&'a str], dedicated_ip: bool) -> Self {
+    pub fn deploy(
+        mut self,
+        locations: &'a [i32],
+        port_range: &'a [&'a str],
+        dedicated_ip: bool,
+    ) -> Self {
         self.fields.deploy = Some(DeployData {
             locations: locations.to_vec(),
             port_range: port_range.to_vec(),
@@ -305,8 +311,7 @@ impl<'a> CreateServer<'a> {
             self.fields.allocation = None;
         }
 
-        let builder = Builder::new(Route::CreateServer.into())
-            .json(self.fields);
+        let builder = Builder::new(Route::CreateServer.into()).json(self.fields);
 
         let res = self.app.request::<FractalItem<Server>>(builder).await?;
 
