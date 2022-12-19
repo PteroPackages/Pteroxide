@@ -32,7 +32,7 @@ impl<'a> GetServers<'a> {
     ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<Server>, Error> {
-        let mut builder = Builder::default().route(Route::GetServers.into());
+        let mut builder = Builder::new(Route::GetServers.into());
 
         if self.with_owner {
             builder = builder.param("include", "user")

@@ -17,6 +17,11 @@ pub struct Builder {
 }
 
 impl Builder {
+    /// Creates a new HTTP request builder.
+    pub fn new(route: Route) -> Self {
+        Self::default().route(route)
+    }
+
     /// Sets the HTTP [`Method`] for the request and returns the builder. Defaults to [`GET`].
     ///
     /// [`GET`]: Method::GET

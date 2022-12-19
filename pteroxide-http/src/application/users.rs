@@ -37,7 +37,7 @@ impl<'a> GetUsers<'a> {
     ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<User>, Error> {
-        let mut builder = Builder::default().route(Route::GetUsers.into());
+        let mut builder = Builder::new(Route::GetUsers.into());
         if self.with_servers {
             builder = builder.param("include", "servers");
         }
@@ -81,7 +81,7 @@ impl<'a> GetUser<'a> {
     ///
     /// Returns an [`Error`] if the request fails or if the user is not found.
     pub async fn exec(&self) -> Result<User, Error> {
-        let mut builder = Builder::default().route(Route::GetUser { id: self.id }.into());
+        let mut builder = Builder::new(Route::GetUser { id: self.id }.into());
         if self.with_servers {
             builder = builder.param("include", "servers");
         }
@@ -183,9 +183,7 @@ impl<'a> CreateUser<'a> {
     ///
     /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(self) -> Result<User, Error> {
-        let builder = Builder::default()
-            .route(Route::CreateUser.into())
-            .json(self.fields);
+        let builder = Builder::new(Route::CreateUser.into()).json(self.fields);
 
         let res = self.app.request::<FractalItem<User>>(builder).await?;
 
@@ -298,9 +296,7 @@ impl<'a> UpdateUser<'a> {
 
         self.fields.external_id = self.fields.external_id.or(user.external_id.as_deref());
 
-        let builder = Builder::default()
-            .route(Route::UpdateUser { id: self.id }.into())
-            .json(self.fields);
+        let builder = Builder::new(Route::UpdateUser { id: self.id }.into()).json(self.fields);
 
         let new = self.app.request::<FractalItem<User>>(builder).await?;
 
@@ -326,7 +322,7 @@ impl<'a> DeleteUser<'a> {
     /// Returns an [`Error`] if the request fails or if the user is not found.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
-            .request::<()>(Builder::default().route(Route::DeleteUser { id: self.id }.into()))
+            .request::<()>(Builder::new(Route::DeleteUser { id: self.id }.into()))
             .await
     }
 }
