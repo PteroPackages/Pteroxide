@@ -11,11 +11,14 @@ pub struct GetServers<'a> {
 impl<'a> GetServers<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application) -> Self {
-        Self { app, with_owner: false }
+        Self {
+            app,
+            with_owner: false,
+        }
     }
 
     /// Include the server [`owner`] in the server [`relationships`].
-    /// 
+    ///
     /// [`owner`]: pteroxide_models::application::User
     pub fn with_owner(mut self, value: bool) -> Self {
         self.with_owner = value;
@@ -29,8 +32,7 @@ impl<'a> GetServers<'a> {
     ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<Server>, Error> {
-        let mut builder = Builder::default()
-            .route(Route::GetServers.into());
+        let mut builder = Builder::default().route(Route::GetServers.into());
 
         if self.with_owner {
             builder = builder.param("include", "user")

@@ -6,17 +6,17 @@ use urlencoding::encode;
 use super::routing::Route;
 
 /// Builder utility for creating HTTP requests, abstracting from the default HTTP request struct.
-pub struct Builder<'a> {
+pub struct Builder {
     pub(crate) method: Method,
     pub(crate) route: String,
-    pub(crate) params: Vec<(&'a str, &'a str)>,
-    pub(crate) include: Vec<&'a str>,
+    pub(crate) params: Vec<(String, String)>,
+    pub(crate) include: Vec<String>,
     pub(crate) body: Body,
     pub(crate) content_type: HeaderValue,
     pub(crate) accept_type: HeaderValue,
 }
 
-impl<'a> Builder<'a> {
+impl Builder {
     /// Sets the HTTP [`Method`] for the request and returns the builder. Defaults to [`GET`].
     ///
     /// [`GET`]: Method::GET
@@ -27,22 +27,23 @@ impl<'a> Builder<'a> {
     }
 
     /// Builds a URI from the route and params set in the builder.
-    pub fn uri(self, domain: String) -> String {
+    pub fn uri(&mut self, domain: String) -> String {
         let url = format!("{}{}", domain, self.route);
-        let mut params = self.params.clone();
 
         if !self.include.is_empty() {
-            params.push(("include", &self.include.clone().join(",")));
+            self.params
+                .push(("include".to_string(), self.include.join(",")));
         }
 
-        if params.is_empty() {
+        if self.params.is_empty() {
             return url;
         }
 
-        let mut query = format!("?{}={}", params[0].0, params[0].1);
+        let mut query = format!("?{}={}", self.params[0].0, self.params[0].1);
 
-        if params.len() > 1 {
-            let parts: Vec<String> = params
+        if self.params.len() > 1 {
+            let parts: Vec<String> = self
+                .params
                 .iter()
                 .skip(1)
                 .map(|(k, v)| format!("&{}={}", k, encode(v)))
@@ -76,14 +77,14 @@ impl<'a> Builder<'a> {
     ///
     /// println!("{}", builder.uri()); // "/api/application/users?include=servers"
     /// ```
-    pub fn param(mut self, key: &'a str, value: &'a str) -> Self {
-        self.params.push((key, value));
+    pub fn param(mut self, key: &str, value: &str) -> Self {
+        self.params.push((key.to_string(), value.to_string()));
 
         self
     }
 
-    pub fn include(mut self, value: &'a str) -> Self {
-        self.include.push(value);
+    pub fn include(mut self, value: &str) -> Self {
+        self.include.push(value.to_string());
 
         self
     }
@@ -160,7 +161,7 @@ impl<'a> Builder<'a> {
     }
 }
 
-impl Default for Builder<'_> {
+impl Default for Builder {
     fn default() -> Self {
         Self {
             method: Default::default(),

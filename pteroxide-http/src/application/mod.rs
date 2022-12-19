@@ -52,7 +52,7 @@ impl Application {
     /// ## Errors
     ///
     /// Returns an [`Error`] if the request fails or if the response fails to be deserialized.
-    pub async fn request<T>(&self, builder: Builder<'_>) -> Result<T, Error>
+    pub async fn request<T>(&self, mut builder: Builder) -> Result<T, Error>
     where
         for<'de> T: Deserialize<'de>,
     {
@@ -109,21 +109,21 @@ impl Application {
     }
 
     /// Returns a request builder for updating a [`User`].
-    /// 
+    ///
     /// [`User`]: pteroxide_models::application::User
     pub fn update_user(&self, id: i32) -> UpdateUser<'_> {
         UpdateUser::new(self, id)
     }
 
     /// Returns a request builder for deleting a [`User`].
-    /// 
+    ///
     /// [`User`]: pteroxide_models::application::User
     pub const fn delete_user(&self, id: i32) -> DeleteUser<'_> {
         DeleteUser::new(self, id)
     }
 
     /// Returns a request builder for getting a list of [`Server`]s.
-    /// 
+    ///
     /// [`Server`]: pteroxide_models::application::Server
     pub const fn get_servers(&self) -> GetServers<'_> {
         GetServers::new(self)
