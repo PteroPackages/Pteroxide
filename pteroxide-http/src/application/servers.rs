@@ -5,7 +5,7 @@ use pteroxide_models::{
 use serde::Serialize;
 use std::collections::HashMap;
 
-use crate::{routing::Application as Route, Application, Builder, Error};
+use crate::{routing::Application as Route, Application, Builder, Error, Value};
 
 #[derive(Debug)]
 pub struct GetServers<'a> {
@@ -148,7 +148,7 @@ struct CreateServerFields<'a> {
     egg: i32,
     docker_image: &'a str,
     startup: &'a str,
-    environment: HashMap<&'a str, &'a str>,
+    environment: HashMap<&'a str, Value>,
     skip_scripts: bool,
     oom_disabled: bool,
     limits: Limits,
@@ -245,7 +245,11 @@ impl<'a> CreateServer<'a> {
         self
     }
 
-    // pub fn environment() {}
+    pub fn env_variable(mut self, name: &'a str, value: Value) -> Self {
+        self.fields.environment.insert(name, value);
+
+        self
+    }
 
     pub fn skip_scripts(mut self, value: bool) -> Self {
         self.fields.skip_scripts = value;
