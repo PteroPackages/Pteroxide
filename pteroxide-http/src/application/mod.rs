@@ -10,7 +10,7 @@ use serde::Deserialize;
 use serde_json::{self, Value};
 
 use self::{
-    nodes::{CreateNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
+    nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
         UnsuspendServer,
@@ -198,5 +198,9 @@ impl Application {
 
     pub fn update_node(&self, id: i32) -> UpdateNode<'_> {
         UpdateNode::new(self, id)
+    }
+
+    pub const fn delete_node(&self, id: i32) -> DeleteNode<'_> {
+        DeleteNode::new(self, id)
     }
 }

@@ -439,3 +439,22 @@ impl<'a> UpdateNode<'a> {
         Ok(new.attributes)
     }
 }
+
+#[derive(Debug)]
+pub struct DeleteNode<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> DeleteNode<'a> {
+    #[doc(hidden)]
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<(), Error> {
+        self.app
+            .request::<()>(Builder::new(Route::DeleteNode { id: self.id }.into()))
+            .await
+    }
+}
