@@ -208,3 +208,216 @@ impl<'a> CreateNode<'a> {
         Ok(res.attributes)
     }
 }
+
+#[derive(Debug, Default, Serialize)]
+struct UpdateNodeFields<'a> {
+    pub name: &'a str,
+    pub description: Option<&'a str>,
+    pub location_id: i32,
+    pub public: Option<bool>,
+    pub fqdn: &'a str,
+    pub scheme: &'a str,
+    pub behind_proxy: Option<bool>,
+    pub memory: i64,
+    pub memory_overallocate: i64,
+    pub disk: i64,
+    pub disk_overallocate: i64,
+    pub daemon_base: &'a str,
+    pub daemon_sftp: i64,
+    pub daemon_listen: i64,
+    pub maintenance_mode: Option<bool>,
+    pub upload_size: i64,
+}
+
+pub struct UpdateNode<'a> {
+    app: &'a Application,
+    id: i32,
+    fields: UpdateNodeFields<'a>,
+}
+
+impl<'a> UpdateNode<'a> {
+    #[doc(hidden)]
+    pub fn new(app: &'a Application, id: i32) -> Self {
+        Self {
+            app,
+            id,
+            fields: Default::default(),
+        }
+    }
+
+    /// Sets the name for the node, otherwise defaults to the current one.
+    pub fn name(mut self, name: &'a str) -> Self {
+        self.fields.name = name;
+
+        self
+    }
+
+    /// Sets the description for the node, taking an [`Option`] which defaults to [`None`] to
+    /// leave it unset.
+    pub fn description(mut self, desc: Option<&'a str>) -> Self {
+        self.fields.description = desc;
+
+        self
+    }
+
+    /// Sets the location ID for the node, otherwise defaults to the existing one.
+    pub fn location(mut self, id: i32) -> Self {
+        self.fields.location_id = id;
+
+        self
+    }
+
+    /// Whether the node should be publicly accessible. See
+    /// [Pterodactyl documentation](https://pterodactyl.io) for more information. Defaults to the
+    /// current state.
+    pub fn public(mut self, value: Option<bool>) -> Self {
+        self.fields.public = value;
+
+        self
+    }
+
+    /// Sets the Fully Qualified Domain Name (FQDN) for the node, otherwise defaults to the
+    /// existing one.
+    pub fn fqdn(mut self, fqdn: &'a str) -> Self {
+        self.fields.fqdn = fqdn;
+
+        self
+    }
+
+    /// Sets the HTTP scheme for the node to use, otherwise defaults to the current one.
+    pub fn scheme(mut self, scheme: &'a str) -> Self {
+        self.fields.scheme = scheme;
+
+        self
+    }
+
+    /// Whether the node is (or should be) behind a proxy. Defaults to the current one.
+    pub fn behind_proxy(mut self, value: Option<bool>) -> Self {
+        self.fields.behind_proxy = value;
+
+        self
+    }
+
+    /// Sets the memory limit for the node, otherwise defaults to the existing one.
+    pub fn memory(mut self, limit: i64) -> Self {
+        self.fields.memory = limit;
+
+        self
+    }
+
+    /// Sets the memory overallocation limit for the node, otherwise defaults to the existing one.
+    pub fn memory_overallocate(mut self, limit: i64) -> Self {
+        self.fields.memory_overallocate = limit;
+
+        self
+    }
+
+    /// Sets the disk limit for the node, otherwise defaults to the existing one.
+    pub fn disk(mut self, limit: i64) -> Self {
+        self.fields.disk = limit;
+
+        self
+    }
+
+    /// Sets the disk overallocation limit for the node, otherwise defaults to the existing one.
+    pub fn disk_overallocate(mut self, limit: i64) -> Self {
+        self.fields.disk_overallocate = limit;
+
+        self
+    }
+
+    /// Sets the daemon base for the node, otherwise defaults to the current one.
+    pub fn daemon_base(mut self, base: &'a str) -> Self {
+        self.fields.daemon_base = base;
+
+        self
+    }
+
+    /// Sets the daemon SFTP port, otherwise defaults to the current one.
+    pub fn daemon_sftp(mut self, port: i64) -> Self {
+        self.fields.daemon_sftp = port;
+
+        self
+    }
+
+    /// Sets the daemon listen port, otherwise defaults to the current one.
+    pub fn daemon_listen(mut self, port: i64) -> Self {
+        self.fields.daemon_listen = port;
+
+        self
+    }
+
+    /// Whether the node should be set to maintenance mode on creation. Defaults to the current
+    /// value.
+    pub fn maintenance_mode(mut self, value: Option<bool>) -> Self {
+        self.fields.maintenance_mode = value;
+
+        self
+    }
+
+    /// Sets the upload size limit for the node, otherwise defaults to the current one.
+    pub fn upload_size(mut self, limit: i64) -> Self {
+        self.fields.upload_size = limit;
+
+        self
+    }
+
+    pub async fn exec(mut self) -> Result<Node, Error> {
+        let node = GetNode::new(self.app, self.id).exec().await?;
+
+        if self.fields.name.is_empty() {
+            self.fields.name = node.name.as_str();
+        }
+
+        self.fields.description = self.fields.description.or(node.description.as_deref());
+
+        if self.fields.location_id == 0 {
+            self.fields.location_id = node.location_id;
+        }
+        if self.fields.public.is_none() {
+            self.fields.public = Some(node.public);
+        }
+        if self.fields.fqdn.is_empty() {
+            self.fields.fqdn = node.fqdn.as_str();
+        }
+        if self.fields.scheme.is_empty() {
+            self.fields.scheme = node.scheme.as_str();
+        }
+        if self.fields.behind_proxy.is_none() {
+            self.fields.behind_proxy = Some(node.behind_proxy);
+        }
+        if self.fields.memory == 0 {
+            self.fields.memory = node.memory;
+        }
+        if self.fields.memory_overallocate == 0 {
+            self.fields.memory_overallocate = node.memory_overallocate;
+        }
+        if self.fields.disk == 0 {
+            self.fields.disk = node.disk;
+        }
+        if self.fields.disk_overallocate == 0 {
+            self.fields.disk_overallocate = node.disk_overallocate;
+        }
+        if self.fields.daemon_base.is_empty() {
+            self.fields.daemon_base = node.daemon_base.as_str();
+        }
+        if self.fields.daemon_sftp == 0 {
+            self.fields.daemon_sftp = node.daemon_sftp;
+        }
+        if self.fields.daemon_listen == 0 {
+            self.fields.daemon_listen = node.daemon_listen;
+        }
+        if self.fields.maintenance_mode.is_none() {
+            self.fields.maintenance_mode = Some(node.maintenance_mode);
+        }
+        if self.fields.upload_size == 0 {
+            self.fields.upload_size = node.upload_size;
+        }
+
+        let builder = Builder::new(Route::UpdateNode { id: self.id }.into()).json(self.fields);
+
+        let new = self.app.request::<FractalItem<Node>>(builder).await?;
+
+        Ok(new.attributes)
+    }
+}
