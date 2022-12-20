@@ -16,6 +16,8 @@ pub enum Application {
     UnsuspendServer { id: i32 },
     ReinstallServer { id: i32 },
     DeleteServer { id: i32, force: bool },
+    GetNodes,
+    GetNode { id: i32 },
 }
 
 impl Application {
@@ -25,7 +27,9 @@ impl Application {
             Application::GetUsers
             | Application::GetUser { .. }
             | Application::GetServers
-            | Application::GetServer { .. } => Method::GET,
+            | Application::GetServer { .. }
+            | Application::GetNodes
+            | Application::GetNode { .. } => Method::GET,
             Application::CreateUser
             | Application::CreateServer
             | Application::SuspendServer { .. }
@@ -66,6 +70,8 @@ impl ToString for Application {
                     format!("/api/application/servers/{}", id)
                 }
             }
+            Application::GetNodes => String::from("/api/application/nodes"),
+            Application::GetNode { id } => format!("/api/application/nodes/{}", id),
         }
     }
 }

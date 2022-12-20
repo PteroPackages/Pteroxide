@@ -9,13 +9,17 @@ use pteroxide_models::fractal::FractalError;
 use serde::Deserialize;
 use serde_json::{self, Value};
 
-use self::servers::{
-    CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
-    UnsuspendServer,
+use self::{
+    nodes::{GetNode, GetNodes},
+    servers::{
+        CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
+        UnsuspendServer,
+    },
+    users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser},
 };
-use self::users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser};
 use super::{error::*, Builder};
 
+pub mod nodes;
 pub mod servers;
 pub mod users;
 
@@ -174,5 +178,13 @@ impl Application {
     /// [`Server`]: pteroxide_models::application::Server
     pub const fn delete_server(&self, id: i32) -> DeleteServer<'_> {
         DeleteServer::new(self, id)
+    }
+
+    pub const fn get_nodes(&self) -> GetNodes<'_> {
+        GetNodes::new(self)
+    }
+
+    pub const fn get_node(&self, id: i32) -> GetNode<'_> {
+        GetNode::new(self, id)
     }
 }
