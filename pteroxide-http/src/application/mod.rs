@@ -180,26 +180,44 @@ impl Application {
         DeleteServer::new(self, id)
     }
 
+    /// Returns a request builder for getting a list of [`Node`]s.
+    ///
+    /// [`Node`]: pteroxide_models::application::Node
     pub const fn get_nodes(&self) -> GetNodes<'_> {
         GetNodes::new(self)
     }
 
+    /// Returns a request builder for getting a specified [`Node`].
+    ///
+    /// [`Node`]: pteroxide_models::application::Node
     pub const fn get_node(&self, id: i32) -> GetNode<'_> {
         GetNode::new(self, id)
     }
 
+    /// Returns a request builder for getting the [`configuration`] of a specified node.
+    ///
+    /// [`configuration`]: pteroxide_models::application::NodeConfiguration
     pub const fn get_node_configuration(&self, id: i32) -> GetNodeConfiguration<'_> {
         GetNodeConfiguration::new(self, id)
     }
 
+    /// Returns a request builder for creating a [`Node`].
+    ///
+    /// [`Node`]: pteroxide_models::application::Node
     pub fn create_node(&self) -> CreateNode<'_> {
         CreateNode::new(self)
     }
 
+    /// Returns a request builder for updating a [`Node`].
+    ///
+    /// [`Node`]: pteroxide_models::application::Node
     pub fn update_node(&self, id: i32) -> UpdateNode<'_> {
         UpdateNode::new(self, id)
     }
 
+    /// Returns a request builder for deleting a [`Node`].
+    ///
+    /// [`Node`]: pteroxide_models::application::Node
     pub const fn delete_node(&self, id: i32) -> DeleteNode<'_> {
         DeleteNode::new(self, id)
     }

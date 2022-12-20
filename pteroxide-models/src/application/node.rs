@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "time")]
 use crate::util::{self, Time};
 
+/// Represents the inner API configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct APIConfiguration {
     pub host: String,
@@ -11,6 +12,9 @@ pub struct APIConfiguration {
     pub upload_limit: i64,
 }
 
+/// Represents a node object. This contains general information about the node such as the
+/// location ID, Fully Qualified Domain Name (FQDN), memory/disk resources and allocated resources.
+/// Most fields of a [`NodeConfiguration`] object can be derived from this object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Node {
     pub id: i32,
@@ -64,6 +68,8 @@ impl Node {
     }
 }
 
+/// Represents the configuration of a node in the panel. This is also used by the Wings API when
+/// being deployed or restarted.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct NodeConfiguration {
     pub debug: bool,
@@ -76,17 +82,20 @@ pub struct NodeConfiguration {
     pub remote: String,
 }
 
+/// Represents the allocated resources of a [`Node`].
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct NodeResources {
     pub memory: i64,
     pub disk: i64,
 }
 
+/// Represents the inner SFTP configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SftpConfiguration {
     pub bind_port: i64,
 }
 
+/// Represents the inner SSL configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SSLConfiguration {
     pub enabled: bool,
@@ -94,6 +103,7 @@ pub struct SSLConfiguration {
     pub key: String,
 }
 
+/// Represents the inner system configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SystemConfiguration {
     pub data: String,

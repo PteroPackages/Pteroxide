@@ -17,6 +17,11 @@ impl<'a> GetNodes<'a> {
         Self { app }
     }
 
+    /// Asynchronously executes the request and returns a list of [`Node`] objects.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<Node>, Error> {
         let res = self
             .app
@@ -39,6 +44,11 @@ impl<'a> GetNode<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns a [`Node`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or if the node is not found.
     pub async fn exec(&self) -> Result<Node, Error> {
         let res = self
             .app
@@ -49,6 +59,7 @@ impl<'a> GetNode<'a> {
     }
 }
 
+#[derive(Debug)]
 pub struct GetNodeConfiguration<'a> {
     app: &'a Application,
     id: i32,
@@ -60,6 +71,12 @@ impl<'a> GetNodeConfiguration<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns the [`configuration`][NodeConfiguration] of
+    /// a node.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or if the node is not found.
     pub async fn exec(&self) -> Result<NodeConfiguration, Error> {
         self.app
             .request::<NodeConfiguration>(Builder::new(Route::GetNodeConfig { id: self.id }.into()))
@@ -218,6 +235,11 @@ impl<'a> CreateNode<'a> {
         self
     }
 
+    /// Asynchronously executes the request and returns the new [`Node`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(self) -> Result<Node, Error> {
         let builder = Builder::new(Route::CreateNode.into()).json(self.fields);
 
@@ -247,6 +269,7 @@ struct UpdateNodeFields<'a> {
     pub upload_size: i64,
 }
 
+#[derive(Debug)]
 pub struct UpdateNode<'a> {
     app: &'a Application,
     id: i32,
@@ -380,6 +403,11 @@ impl<'a> UpdateNode<'a> {
         self
     }
 
+    /// Asynchronously executes the request and returns the updated [`Node`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(mut self) -> Result<Node, Error> {
         let node = GetNode::new(self.app, self.id).exec().await?;
 
@@ -452,6 +480,11 @@ impl<'a> DeleteNode<'a> {
         Self { app, id }
     }
 
+    /// Asynchronously executes the request and returns nothing.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or if the node is not found.
     pub async fn exec(&self) -> Result<(), Error> {
         self.app
             .request::<()>(Builder::new(Route::DeleteNode { id: self.id }.into()))
