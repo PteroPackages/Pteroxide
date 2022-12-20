@@ -1,5 +1,5 @@
 use pteroxide_models::{
-    application::Node,
+    application::{Node, NodeConfiguration},
     fractal::{FractalItem, FractalList},
 };
 use serde::Serialize;
@@ -46,6 +46,24 @@ impl<'a> GetNode<'a> {
             .await?;
 
         Ok(res.attributes)
+    }
+}
+
+pub struct GetNodeConfiguration<'a> {
+    app: &'a Application,
+    id: i32,
+}
+
+impl<'a> GetNodeConfiguration<'a> {
+    #[doc(hidden)]
+    pub const fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id }
+    }
+
+    pub async fn exec(&self) -> Result<NodeConfiguration, Error> {
+        self.app
+            .request::<NodeConfiguration>(Builder::new(Route::GetNodeConfig { id: self.id }.into()))
+            .await
     }
 }
 

@@ -18,6 +18,7 @@ pub enum Application {
     DeleteServer { id: i32, force: bool },
     GetNodes,
     GetNode { id: i32 },
+    GetNodeConfig { id: i32 },
     CreateNode,
     UpdateNode { id: i32 },
 }
@@ -31,7 +32,8 @@ impl Application {
             | Application::GetServers
             | Application::GetServer { .. }
             | Application::GetNodes
-            | Application::GetNode { .. } => Method::GET,
+            | Application::GetNode { .. }
+            | Application::GetNodeConfig { .. } => Method::GET,
             Application::CreateUser
             | Application::CreateServer
             | Application::SuspendServer { .. }
@@ -78,6 +80,9 @@ impl ToString for Application {
             }
             Application::GetNode { id } | Application::UpdateNode { id } => {
                 format!("/api/application/nodes/{}", id)
+            }
+            Application::GetNodeConfig { id } => {
+                format!("/api/application/nodes/{}/configuration", id)
             }
         }
     }

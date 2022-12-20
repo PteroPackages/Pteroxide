@@ -10,7 +10,7 @@ use serde::Deserialize;
 use serde_json::{self, Value};
 
 use self::{
-    nodes::{CreateNode, GetNode, GetNodes, UpdateNode},
+    nodes::{CreateNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
         UnsuspendServer,
@@ -186,6 +186,10 @@ impl Application {
 
     pub const fn get_node(&self, id: i32) -> GetNode<'_> {
         GetNode::new(self, id)
+    }
+
+    pub const fn get_node_configuration(&self, id: i32) -> GetNodeConfiguration<'_> {
+        GetNodeConfiguration::new(self, id)
     }
 
     pub fn create_node(&self) -> CreateNode<'_> {
