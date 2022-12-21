@@ -93,15 +93,15 @@ struct CreateNodeFields<'a> {
     pub fqdn: &'a str,
     pub scheme: &'a str,
     pub behind_proxy: bool,
-    pub memory: i64,
-    pub memory_overallocate: i64,
-    pub disk: i64,
-    pub disk_overallocate: i64,
+    pub memory: i32,
+    pub memory_overallocate: i32,
+    pub disk: i32,
+    pub disk_overallocate: i32,
     pub daemon_base: &'a str,
-    pub daemon_sftp: i64,
-    pub daemon_listen: i64,
+    pub daemon_sftp: i32,
+    pub daemon_listen: i32,
     pub maintenance_mode: bool,
-    pub upload_size: i64,
+    pub upload_size: i32,
 }
 
 #[derive(Debug)]
@@ -182,7 +182,7 @@ impl<'a> CreateNode<'a> {
 
     /// Sets the memory limit and memory overallocation limit for the node.
     #[must_use = "a node must have a memory limit"]
-    pub fn memory(mut self, limit: i64, overallocate: i64) -> Self {
+    pub fn memory(mut self, limit: i32, overallocate: i32) -> Self {
         self.fields.memory = limit;
         self.fields.memory_overallocate = overallocate;
 
@@ -191,7 +191,7 @@ impl<'a> CreateNode<'a> {
 
     /// Sets the disk limit and disk overallocation limit for the node.
     #[must_use = "a node must have a disk limit"]
-    pub fn disk(mut self, limit: i64, overallocate: i64) -> Self {
+    pub fn disk(mut self, limit: i32, overallocate: i32) -> Self {
         self.fields.disk = limit;
         self.fields.disk_overallocate = overallocate;
 
@@ -206,14 +206,14 @@ impl<'a> CreateNode<'a> {
     }
 
     /// Sets the daemon SFTP port. Defaults to `2022`.
-    pub fn daemon_sftp(mut self, port: i64) -> Self {
+    pub fn daemon_sftp(mut self, port: i32) -> Self {
         self.fields.daemon_sftp = port;
 
         self
     }
 
     /// Sets the daemon listen port. Defaults to `8080`.
-    pub fn daemon_listen(mut self, port: i64) -> Self {
+    pub fn daemon_listen(mut self, port: i32) -> Self {
         self.fields.daemon_listen = port;
 
         self
@@ -229,7 +229,7 @@ impl<'a> CreateNode<'a> {
 
     /// Sets the upload size limit for the node.
     #[must_use = "a node must have an upload size limit"]
-    pub fn upload_size(mut self, limit: i64) -> Self {
+    pub fn upload_size(mut self, limit: i32) -> Self {
         self.fields.upload_size = limit;
 
         self
@@ -257,15 +257,15 @@ struct UpdateNodeFields<'a> {
     pub fqdn: &'a str,
     pub scheme: &'a str,
     pub behind_proxy: Option<bool>,
-    pub memory: i64,
-    pub memory_overallocate: i64,
-    pub disk: i64,
-    pub disk_overallocate: i64,
+    pub memory: i32,
+    pub memory_overallocate: i32,
+    pub disk: i32,
+    pub disk_overallocate: i32,
     pub daemon_base: &'a str,
-    pub daemon_sftp: i64,
-    pub daemon_listen: i64,
+    pub daemon_sftp: i32,
+    pub daemon_listen: i32,
     pub maintenance_mode: Option<bool>,
-    pub upload_size: i64,
+    pub upload_size: i32,
 }
 
 #[derive(Debug)]
@@ -339,28 +339,28 @@ impl<'a> UpdateNode<'a> {
     }
 
     /// Sets the memory limit for the node, otherwise defaults to the existing one.
-    pub fn memory(mut self, limit: i64) -> Self {
+    pub fn memory(mut self, limit: i32) -> Self {
         self.fields.memory = limit;
 
         self
     }
 
     /// Sets the memory overallocation limit for the node, otherwise defaults to the existing one.
-    pub fn memory_overallocate(mut self, limit: i64) -> Self {
+    pub fn memory_overallocate(mut self, limit: i32) -> Self {
         self.fields.memory_overallocate = limit;
 
         self
     }
 
     /// Sets the disk limit for the node, otherwise defaults to the existing one.
-    pub fn disk(mut self, limit: i64) -> Self {
+    pub fn disk(mut self, limit: i32) -> Self {
         self.fields.disk = limit;
 
         self
     }
 
     /// Sets the disk overallocation limit for the node, otherwise defaults to the existing one.
-    pub fn disk_overallocate(mut self, limit: i64) -> Self {
+    pub fn disk_overallocate(mut self, limit: i32) -> Self {
         self.fields.disk_overallocate = limit;
 
         self
@@ -374,14 +374,14 @@ impl<'a> UpdateNode<'a> {
     }
 
     /// Sets the daemon SFTP port, otherwise defaults to the current one.
-    pub fn daemon_sftp(mut self, port: i64) -> Self {
+    pub fn daemon_sftp(mut self, port: i32) -> Self {
         self.fields.daemon_sftp = port;
 
         self
     }
 
     /// Sets the daemon listen port, otherwise defaults to the current one.
-    pub fn daemon_listen(mut self, port: i64) -> Self {
+    pub fn daemon_listen(mut self, port: i32) -> Self {
         self.fields.daemon_listen = port;
 
         self
@@ -396,7 +396,7 @@ impl<'a> UpdateNode<'a> {
     }
 
     /// Sets the upload size limit for the node, otherwise defaults to the current one.
-    pub fn upload_size(mut self, limit: i64) -> Self {
+    pub fn upload_size(mut self, limit: i32) -> Self {
         self.fields.upload_size = limit;
 
         self

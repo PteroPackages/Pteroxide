@@ -42,15 +42,6 @@ impl From<i32> for Value {
     }
 }
 
-impl From<i64> for Value {
-    fn from(v: i64) -> Self {
-        Self {
-            inner: v.to_string(),
-            kind: ValueKind::Number,
-        }
-    }
-}
-
 impl From<bool> for Value {
     fn from(v: bool) -> Self {
         Self {
@@ -67,7 +58,7 @@ impl Serialize for Value {
     {
         match self.kind {
             ValueKind::String => serializer.serialize_str(&self.inner),
-            ValueKind::Number => serializer.serialize_i64(self.inner.parse::<i64>().unwrap()),
+            ValueKind::Number => serializer.serialize_i32(self.inner.parse::<i32>().unwrap()),
             ValueKind::Boolean => serializer.serialize_bool(self.inner.parse::<bool>().unwrap()),
             ValueKind::Null => serializer.serialize_none(),
         }

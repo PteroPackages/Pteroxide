@@ -18,11 +18,11 @@ pub struct FeatureLimits {
 /// Represents the limits of a server.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Limits {
-    pub memory: i64,
-    pub swap: i64,
-    pub disk: i64,
-    pub io: Option<i64>,
-    pub cpu: i64,
+    pub memory: i32,
+    pub swap: i32,
+    pub disk: i32,
+    pub io: Option<i32>,
+    pub cpu: i32,
     pub threads: Option<String>,
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]

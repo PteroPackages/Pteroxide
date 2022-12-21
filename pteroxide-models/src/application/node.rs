@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct APIConfiguration {
     pub host: String,
-    pub port: i64,
+    pub port: i32,
     pub ssl: SSLConfiguration,
-    pub upload_limit: i64,
+    pub upload_limit: i32,
 }
 
 /// Represents a node object. This contains general information about the node such as the
@@ -22,15 +22,15 @@ pub struct Node {
     pub fqdn: String,
     pub scheme: String,
     pub behind_proxy: bool,
-    pub memory: i64,
-    pub memory_overallocate: i64,
-    pub disk: i64,
-    pub disk_overallocate: i64,
+    pub memory: i32,
+    pub memory_overallocate: i32,
+    pub disk: i32,
+    pub disk_overallocate: i32,
     pub daemon_base: String,
-    pub daemon_sftp: i64,
-    pub daemon_listen: i64,
+    pub daemon_sftp: i32,
+    pub daemon_listen: i32,
     pub maintenance_mode: bool,
-    pub upload_size: i64,
+    pub upload_size: i32,
     pub allocated_resources: NodeResources,
     pub created_at: String,
     pub updated_at: Option<String>,
@@ -56,14 +56,14 @@ pub struct NodeConfiguration {
 /// Represents the allocated resources of a [`Node`].
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct NodeResources {
-    pub memory: i64,
-    pub disk: i64,
+    pub memory: i32,
+    pub disk: i32,
 }
 
 /// Represents the inner SFTP configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct SftpConfiguration {
-    pub bind_port: i64,
+    pub bind_port: i32,
 }
 
 /// Represents the inner SSL configuration of a [`NodeConfiguration`] object.
