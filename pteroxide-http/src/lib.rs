@@ -8,4 +8,4 @@ pub mod error;
 pub mod routing;
 pub mod value;
 
-pub use self::{application::Application, builder::Builder, error::Error, value::*};
+pub use self::{application::Application, builder::Builder, error::Error, value::Value};
