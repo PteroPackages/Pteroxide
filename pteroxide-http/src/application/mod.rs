@@ -10,6 +10,7 @@ use serde::Deserialize;
 use serde_json::{self, Value};
 
 use self::{
+    locations::{GetLocation, GetLocations},
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
@@ -19,6 +20,7 @@ use self::{
 };
 use super::{error::*, Builder};
 
+pub mod locations;
 pub mod nodes;
 pub mod servers;
 pub mod users;
@@ -220,5 +222,13 @@ impl Application {
     /// [`Node`]: pteroxide_models::application::Node
     pub const fn delete_node(&self, id: i32) -> DeleteNode<'_> {
         DeleteNode::new(self, id)
+    }
+
+    pub const fn get_locations(&self) -> GetLocations<'_> {
+        GetLocations::new(self)
+    }
+
+    pub const fn get_location(&self, id: i32) -> GetLocation<'_> {
+        GetLocation::new(self, id)
     }
 }
