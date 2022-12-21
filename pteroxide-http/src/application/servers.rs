@@ -346,7 +346,6 @@ impl<'a> CreateServer<'a> {
         }
 
         let builder = Builder::new(Route::CreateServer.into()).json(self.fields);
-
         let res = self.app.request::<FractalItem<Server>>(builder).await?;
 
         Ok(res.attributes)

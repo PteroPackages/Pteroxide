@@ -242,7 +242,6 @@ impl<'a> CreateNode<'a> {
     /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(self) -> Result<Node, Error> {
         let builder = Builder::new(Route::CreateNode.into()).json(self.fields);
-
         let res = self.app.request::<FractalItem<Node>>(builder).await?;
 
         Ok(res.attributes)
@@ -461,7 +460,6 @@ impl<'a> UpdateNode<'a> {
         }
 
         let builder = Builder::new(Route::UpdateNode { id: self.id }.into()).json(self.fields);
-
         let new = self.app.request::<FractalItem<Node>>(builder).await?;
 
         Ok(new.attributes)

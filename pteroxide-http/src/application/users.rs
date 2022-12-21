@@ -184,7 +184,6 @@ impl<'a> CreateUser<'a> {
     /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(self) -> Result<User, Error> {
         let builder = Builder::new(Route::CreateUser.into()).json(self.fields);
-
         let res = self.app.request::<FractalItem<User>>(builder).await?;
 
         Ok(res.attributes)
@@ -297,7 +296,6 @@ impl<'a> UpdateUser<'a> {
         self.fields.external_id = self.fields.external_id.or(user.external_id.as_deref());
 
         let builder = Builder::new(Route::UpdateUser { id: self.id }.into()).json(self.fields);
-
         let new = self.app.request::<FractalItem<User>>(builder).await?;
 
         Ok(new.attributes)

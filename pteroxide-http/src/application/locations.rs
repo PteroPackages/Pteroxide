@@ -71,7 +71,10 @@ pub struct CreateLocation<'a> {
 impl<'a> CreateLocation<'a> {
     #[doc(hidden)]
     pub fn new(app: &'a Application) -> Self {
-        Self { app, fields: Default::default() }
+        Self {
+            app,
+            fields: Default::default(),
+        }
     }
 
     /// Sets the short code for the location. This is generally based on the
@@ -114,7 +117,11 @@ pub struct UpdateLocation<'a> {
 impl<'a> UpdateLocation<'a> {
     #[doc(hidden)]
     pub fn new(app: &'a Application, id: i32) -> Self {
-        Self { app, id, fields: Default::default() }
+        Self {
+            app,
+            id,
+            fields: Default::default(),
+        }
     }
 
     /// Sets the short code for the location, otherwise defaults to the current on. This is
@@ -172,6 +179,8 @@ impl<'a> DeleteLocation<'a> {
     ///
     /// Returns an [`Error`] if the request fails or if the location is not found.
     pub async fn exec(&self) -> Result<(), Error> {
-        self.app.request::<()>(Builder::new(Route::DeleteLocation { id: self.id }.into())).await
+        self.app
+            .request::<()>(Builder::new(Route::DeleteLocation { id: self.id }.into()))
+            .await
     }
 }
