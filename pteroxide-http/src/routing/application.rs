@@ -27,6 +27,9 @@ pub enum Application {
     CreateLocation,
     UpdateLocation { id: i32 },
     DeleteLocation { id: i32 },
+    GetAllocations { node: i32 },
+    CreateAllocations { node: i32 },
+    DeleteAllocation { node: i32, id: i32 },
 }
 
 impl Application {
@@ -41,21 +44,24 @@ impl Application {
             | Application::GetNode { .. }
             | Application::GetNodeConfig { .. }
             | Application::GetLocations
-            | Application::GetLocation { .. } => Method::GET,
+            | Application::GetLocation { .. }
+            | Application::GetAllocations { .. } => Method::GET,
             Application::CreateUser
             | Application::CreateServer
             | Application::SuspendServer { .. }
             | Application::UnsuspendServer { .. }
             | Application::ReinstallServer { .. }
             | Application::CreateNode
-            | Application::CreateLocation => Method::POST,
+            | Application::CreateLocation
+            | Application::CreateAllocations { .. } => Method::POST,
             Application::UpdateUser { .. }
             | Application::UpdateNode { .. }
             | Application::UpdateLocation { .. } => Method::PATCH,
             Application::DeleteUser { .. }
             | Application::DeleteServer { .. }
             | Application::DeleteNode { .. }
-            | Application::DeleteLocation { .. } => Method::DELETE,
+            | Application::DeleteLocation { .. }
+            | Application::DeleteAllocation { .. } => Method::DELETE,
         }
     }
 }
@@ -106,6 +112,12 @@ impl ToString for Application {
             Application::GetLocation { id }
             | Application::UpdateLocation { id }
             | Application::DeleteLocation { id } => format!("/api/application/locations/{}", id),
+            Application::GetAllocations { node } | Application::CreateAllocations { node } => {
+                format!("/api/application/nodes/{}/allocations", node)
+            }
+            Application::DeleteAllocation { node, id } => {
+                format!("/api/application/nodes/{}/allocations/{}", node, id)
+            }
         }
     }
 }

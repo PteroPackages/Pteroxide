@@ -10,6 +10,7 @@ use serde::Deserialize;
 use serde_json::{self, Value};
 
 use self::{
+    allocations::{CreateAllocations, DeleteAllocation, GetAllocations},
     locations::{CreateLocation, DeleteLocation, GetLocation, GetLocations, UpdateLocation},
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
@@ -20,6 +21,7 @@ use self::{
 };
 use super::{error::*, Builder};
 
+pub mod allocations;
 pub mod locations;
 pub mod nodes;
 pub mod servers;
@@ -257,5 +259,26 @@ impl Application {
     /// [`Location`]: pteroxide_models::application::Location
     pub const fn delete_location(&self, id: i32) -> DeleteLocation<'_> {
         DeleteLocation::new(self, id)
+    }
+
+    /// Returns a request builder for getting a list of [`Allocation`]s.
+    ///
+    /// [`Allocation`]: pteroxide_models::application::Allocation
+    pub const fn get_allocations(&self, node: i32) -> GetAllocations<'_> {
+        GetAllocations::new(self, node)
+    }
+
+    /// Returns a request builder for creating [`Allocation`]s.
+    ///
+    /// [`Allocation`]: pteroxide_models::application::Allocation
+    pub fn create_allocations(&self, node: i32) -> CreateAllocations<'_> {
+        CreateAllocations::new(self, node)
+    }
+
+    /// Returns a request builder for deleting an [`Allocation`].
+    ///
+    /// [`Allocation`]: pteroxide_models::application::Allocation
+    pub const fn delete_allocation(&self, node: i32, id: i32) -> DeleteAllocation<'_> {
+        DeleteAllocation::new(self, node, id)
     }
 }
