@@ -10,7 +10,7 @@ use serde::Deserialize;
 use serde_json::{self, Value};
 
 use self::{
-    locations::{GetLocation, GetLocations},
+    locations::{CreateLocation, DeleteLocation, GetLocation, GetLocations, UpdateLocation},
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
@@ -224,11 +224,38 @@ impl Application {
         DeleteNode::new(self, id)
     }
 
+    /// Returns a request builder for getting a list of [`Location`]s.
+    ///
+    /// [`Location`]: pteroxide_models::application::Location
     pub const fn get_locations(&self) -> GetLocations<'_> {
         GetLocations::new(self)
     }
 
+    /// Returns a request builder for getting a specified [`Location`].
+    ///
+    /// [`Location`]: pteroxide_models::application::Location
     pub const fn get_location(&self, id: i32) -> GetLocation<'_> {
         GetLocation::new(self, id)
+    }
+
+    /// Returns a request builder for creating a [`Location`].
+    ///
+    /// [`Location`]: pteroxide_models::application::Location
+    pub fn create_location(&self) -> CreateLocation<'_> {
+        CreateLocation::new(self)
+    }
+
+    /// Returns a request builder for updating a [`Location`].
+    ///
+    /// [`Location`]: pteroxide_models::application::Location
+    pub fn update_location(&self, id: i32) -> UpdateLocation<'_> {
+        UpdateLocation::new(self, id)
+    }
+
+    /// Returns a request builder for deleting a [`Location`].
+    ///
+    /// [`Location`]: pteroxide_models::application::Location
+    pub const fn delete_location(&self, id: i32) -> DeleteLocation<'_> {
+        DeleteLocation::new(self, id)
     }
 }

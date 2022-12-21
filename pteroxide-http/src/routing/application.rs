@@ -24,6 +24,9 @@ pub enum Application {
     DeleteNode { id: i32 },
     GetLocations,
     GetLocation { id: i32 },
+    CreateLocation,
+    UpdateLocation { id: i32 },
+    DeleteLocation { id: i32 },
 }
 
 impl Application {
@@ -44,11 +47,15 @@ impl Application {
             | Application::SuspendServer { .. }
             | Application::UnsuspendServer { .. }
             | Application::ReinstallServer { .. }
-            | Application::CreateNode => Method::POST,
-            Application::UpdateUser { .. } | Application::UpdateNode { .. } => Method::PATCH,
+            | Application::CreateNode
+            | Application::CreateLocation => Method::POST,
+            Application::UpdateUser { .. }
+            | Application::UpdateNode { .. }
+            | Application::UpdateLocation { .. } => Method::PATCH,
             Application::DeleteUser { .. }
             | Application::DeleteServer { .. }
-            | Application::DeleteNode { .. } => Method::DELETE,
+            | Application::DeleteNode { .. }
+            | Application::DeleteLocation { .. } => Method::DELETE,
         }
     }
 }
@@ -93,8 +100,12 @@ impl ToString for Application {
             Application::GetNodeConfig { id } => {
                 format!("/api/application/nodes/{}/configuration", id)
             }
-            Application::GetLocations => String::from("/api/application/locations"),
-            Application::GetLocation { id } => format!("/api/application/locations/{}", id),
+            Application::GetLocations | Application::CreateLocation => {
+                String::from("/api/application/locations")
+            }
+            Application::GetLocation { id }
+            | Application::UpdateLocation { id }
+            | Application::DeleteLocation { id } => format!("/api/application/locations/{}", id),
         }
     }
 }
