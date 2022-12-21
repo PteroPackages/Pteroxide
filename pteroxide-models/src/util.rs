@@ -21,3 +21,38 @@ pub fn try_parse(input: String) -> Result<Time, Error> {
 pub fn parse(input: String) -> Time {
     try_parse(input).unwrap()
 }
+
+#[macro_export]
+macro_rules! impl_time {
+    ($type:ident) => {
+        use $crate::util::{self, Time};
+
+        impl $type {
+            /// Parses the string created at time string into a [`Time`] object.
+            pub fn parse_created_at(&self) -> Time {
+                util::parse(self.created_at.clone())
+            }
+
+            /// Attempts to parse the created at time string into a [`Time`] object, returning an
+            /// option.
+            pub fn try_parse_created_at(&self) -> Option<Time> {
+                match util::try_parse(self.created_at.clone()) {
+                    Ok(t) => Some(t),
+                    Err(_) => None,
+                }
+            }
+
+            /// Parses the updated at time string into a [`Time`] object, returning an option if the field
+            /// has a value.
+            pub fn parse_updated_at(&self) -> Option<Time> {
+                match &self.updated_at {
+                    Some(s) => match util::try_parse(s.clone()) {
+                        Ok(t) => Some(t),
+                        Err(_) => None,
+                    },
+                    None => None,
+                }
+            }
+        }
+    };
+}
