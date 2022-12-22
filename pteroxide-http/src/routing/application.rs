@@ -32,6 +32,8 @@ pub enum Application {
     DeleteAllocation { node: i32, id: i32 },
     GetNests,
     GetNest { id: i32 },
+    GetEggs { nest: i32 },
+    GetEgg { nest: i32, id: i32 },
 }
 
 impl Application {
@@ -49,7 +51,9 @@ impl Application {
             | Application::GetLocation { .. }
             | Application::GetAllocations { .. }
             | Application::GetNests
-            | Application::GetNest { .. } => Method::GET,
+            | Application::GetNest { .. }
+            | Application::GetEggs { .. }
+            | Application::GetEgg { .. } => Method::GET,
             Application::CreateUser
             | Application::CreateServer
             | Application::SuspendServer { .. }
@@ -124,6 +128,10 @@ impl ToString for Application {
             }
             Application::GetNests => String::from("/api/application/nests"),
             Application::GetNest { id } => format!("/api/application/nests/{}", id),
+            Application::GetEggs { nest } => format!("/api/application/nests/{}/eggs", nest),
+            Application::GetEgg { nest, id } => {
+                format!("/api/application/nests/{}/eggs/{}", nest, id)
+            }
         }
     }
 }

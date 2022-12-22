@@ -11,6 +11,7 @@ use serde_json::{self, Value};
 
 use self::{
     allocations::{CreateAllocations, DeleteAllocation, GetAllocations},
+    eggs::{GetEgg, GetEggs},
     locations::{CreateLocation, DeleteLocation, GetLocation, GetLocations, UpdateLocation},
     nests::{GetNest, GetNests},
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
@@ -23,6 +24,7 @@ use self::{
 use super::{error::*, Builder};
 
 pub mod allocations;
+pub mod eggs;
 pub mod locations;
 pub mod nests;
 pub mod nodes;
@@ -296,5 +298,19 @@ impl Application {
     /// [`Nest`]: pteroxide_models::application::Nest
     pub const fn get_nest(&self, id: i32) -> GetNest<'_> {
         GetNest::new(self, id)
+    }
+
+    /// Returns a request builder for getting a list of [`Egg`]s.
+    ///
+    /// [`Egg`]: pteroxide_models::application::Egg
+    pub const fn get_nest_eggs(&self, nest: i32) -> GetEggs<'_> {
+        GetEggs::new(self, nest)
+    }
+
+    /// Returns a request builder for getting a specified [`Egg`].
+    ///
+    /// [`Egg`]: pteroxide_models::application::Egg
+    pub const fn get_nest_egg(&self, nest: i32, id: i32) -> GetEgg<'_> {
+        GetEgg::new(self, nest, id)
     }
 }
