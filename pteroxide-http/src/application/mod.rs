@@ -12,6 +12,7 @@ use serde_json::{self, Value};
 use self::{
     allocations::{CreateAllocations, DeleteAllocation, GetAllocations},
     locations::{CreateLocation, DeleteLocation, GetLocation, GetLocations, UpdateLocation},
+    nests::{GetNest, GetNests},
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
@@ -23,6 +24,7 @@ use super::{error::*, Builder};
 
 pub mod allocations;
 pub mod locations;
+pub mod nests;
 pub mod nodes;
 pub mod servers;
 pub mod users;
@@ -280,5 +282,19 @@ impl Application {
     /// [`Allocation`]: pteroxide_models::application::Allocation
     pub const fn delete_allocation(&self, node: i32, id: i32) -> DeleteAllocation<'_> {
         DeleteAllocation::new(self, node, id)
+    }
+
+    /// Returns a request builder for getting a list of [`Nest`]s.
+    ///
+    /// [`Nest`]: pteroxide_models::application::Nest
+    pub const fn get_nests(&self) -> GetNests<'_> {
+        GetNests::new(self)
+    }
+
+    /// Returns a request builder for getting a specified [`Nest`].
+    ///
+    /// [`Nest`]: pteroxide_models::application::Nest
+    pub const fn get_nest(&self, id: i32) -> GetNest<'_> {
+        GetNest::new(self, id)
     }
 }
