@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+/// Represents an allocation object (a combination of an IP address and port).
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Allocation {
     pub id: i32,
