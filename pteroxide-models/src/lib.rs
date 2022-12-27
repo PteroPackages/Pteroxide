@@ -8,7 +8,7 @@ pub mod fractal;
 pub mod util;
 
 /// Represents the feature limits of a server.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FeatureLimits {
     pub allocations: i32,
     pub backups: i32,
@@ -16,7 +16,7 @@ pub struct FeatureLimits {
 }
 
 /// Represents the limits of a server.
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Limits {
     pub memory: i32,
     pub swap: i32,

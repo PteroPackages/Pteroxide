@@ -19,7 +19,7 @@ struct DeployData<'a> {
     dedicated_ip: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 struct CreateServerFields<'a> {
     name: &'a str,
     description: Option<&'a str>,
@@ -51,35 +51,7 @@ impl<'a> CreateServer<'a> {
     pub fn new(app: &'a Application) -> Self {
         Self {
             app,
-            fields: CreateServerFields {
-                name: "",
-                description: None,
-                external_id: None,
-                user: 0,
-                egg: 0,
-                docker_image: "",
-                startup: "",
-                environment: HashMap::new(),
-                skip_scripts: false,
-                oom_disabled: false,
-                limits: Limits {
-                    memory: 0,
-                    swap: 0,
-                    disk: 0,
-                    io: None,
-                    cpu: 0,
-                    threads: None,
-                    oom_disabled: None,
-                },
-                feature_limits: FeatureLimits {
-                    allocations: 0,
-                    backups: 0,
-                    databases: 0,
-                },
-                allocation: None,
-                deploy: None,
-                start_on_completion: false,
-            },
+            fields: Default::default(),
         }
     }
 

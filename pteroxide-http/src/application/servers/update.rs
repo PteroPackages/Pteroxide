@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::{routing::Application as Route, Application, Builder, Error};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Default, Serialize)]
 struct UpdateServerBuildFields {
     pub allocation_id: i32,
     pub oom_disabled: bool,
@@ -28,26 +28,7 @@ impl<'a> UpdateServerBuild<'a> {
         Self {
             app,
             id,
-            fields: UpdateServerBuildFields {
-                allocation_id: 0,
-                oom_disabled: false,
-                limits: Limits {
-                    memory: 0,
-                    disk: 0,
-                    swap: 0,
-                    cpu: 0,
-                    io: None,
-                    oom_disabled: None,
-                    threads: None,
-                },
-                feature_limits: FeatureLimits {
-                    allocations: 0,
-                    backups: 0,
-                    databases: 0,
-                },
-                add_allocations: Vec::new(),
-                remove_allocations: Vec::new(),
-            },
+            fields: Default::default(),
         }
     }
 
