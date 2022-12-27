@@ -17,7 +17,7 @@ use self::{
     nodes::{CreateNode, DeleteNode, GetNode, GetNodeConfiguration, GetNodes, UpdateNode},
     servers::{
         CreateServer, DeleteServer, GetServer, GetServers, ReinstallServer, SuspendServer,
-        UnsuspendServer,
+        UnsuspendServer, UpdateServerBuild,
     },
     users::{CreateUser, DeleteUser, GetUser, GetUsers, UpdateUser},
 };
@@ -158,6 +158,13 @@ impl Application {
     /// [`Server`]: pteroxide_models::application::Server
     pub fn create_server(&self) -> CreateServer<'_> {
         CreateServer::new(self)
+    }
+
+    /// Returns a request builder for updating a [`Server`]'s build configuration.
+    ///
+    /// [`Server`]: pteroxide_models::application::Server
+    pub fn update_server_build(&self, id: i32) -> UpdateServerBuild<'_> {
+        UpdateServerBuild::new(self, id)
     }
 
     /// Returns a request builder for suspending a [`Server`].

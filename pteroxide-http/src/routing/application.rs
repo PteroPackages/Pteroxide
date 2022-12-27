@@ -12,6 +12,9 @@ pub enum Application {
     GetServers,
     GetServer { id: i32 },
     CreateServer,
+    UpdateServerBuild { id: i32 },
+    UpdateServerDetails { id: i32 },
+    UpdateServerStartup { id: i32 },
     SuspendServer { id: i32 },
     UnsuspendServer { id: i32 },
     ReinstallServer { id: i32 },
@@ -63,6 +66,9 @@ impl Application {
             | Application::CreateLocation
             | Application::CreateAllocations { .. } => Method::POST,
             Application::UpdateUser { .. }
+            | Application::UpdateServerBuild { .. }
+            | Application::UpdateServerDetails { .. }
+            | Application::UpdateServerStartup { .. }
             | Application::UpdateNode { .. }
             | Application::UpdateLocation { .. } => Method::PATCH,
             Application::DeleteUser { .. }
@@ -89,6 +95,15 @@ impl ToString for Application {
                 String::from("/api/application/servers")
             }
             Application::GetServer { id } => format!("/api/application/servers/{}", id),
+            Application::UpdateServerBuild { id } => {
+                format!("/api/application/servers/{}/build", id)
+            }
+            Application::UpdateServerDetails { id } => {
+                format!("/api/application/servers/{}/details", id)
+            }
+            Application::UpdateServerStartup { id } => {
+                format!("/api/application/servers/{}/startup", id)
+            }
             Application::SuspendServer { id } => format!("/api/application/servers/{}/suspend", id),
             Application::UnsuspendServer { id } => {
                 format!("/api/application/servers/{}/unsuspend", id)
