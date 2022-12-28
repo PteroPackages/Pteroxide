@@ -22,9 +22,9 @@ struct RawServerRelations {
 }
 
 #[doc(hidden)]
-struct ServerRelationVisitor;
+struct RelationsVisitor;
 
-impl<'de> Visitor<'de> for ServerRelationVisitor {
+impl<'de> Visitor<'de> for RelationsVisitor {
     type Value = ServerRelations;
 
     fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
@@ -88,6 +88,6 @@ impl<'de> Deserialize<'de> for ServerRelations {
     where
         D: serde::Deserializer<'de>,
     {
-        deserializer.deserialize_map(ServerRelationVisitor)
+        deserializer.deserialize_map(RelationsVisitor)
     }
 }
