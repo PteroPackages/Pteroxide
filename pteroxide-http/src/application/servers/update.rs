@@ -2,8 +2,8 @@ use pteroxide_models::{application::Server, fractal::FractalItem, FeatureLimits,
 use serde::Serialize;
 use std::collections::HashMap;
 
-use crate::{routing::Application as Route, Application, Builder, Error, Value};
 use super::GetServer;
+use crate::{routing::Application as Route, Application, Builder, Error, Value};
 
 #[derive(Debug, Default, Serialize)]
 struct UpdateServerBuildFields {
@@ -127,7 +127,11 @@ pub struct UpdateServerDetails<'a> {
 impl<'a> UpdateServerDetails<'a> {
     #[doc(hidden)]
     pub fn new(app: &'a Application, id: i32) -> Self {
-        Self { app, id, fields: Default::default() }
+        Self {
+            app,
+            id,
+            fields: Default::default(),
+        }
     }
 
     /// Sets the external identifier for the server, otherwise defaults to the existing one. Make
@@ -178,7 +182,8 @@ impl<'a> UpdateServerDetails<'a> {
             self.fields.user = server.user;
         }
 
-        let builder = Builder::new(Route::UpdateServerDetails { id: self.id }.into()).json(self.fields);
+        let builder =
+            Builder::new(Route::UpdateServerDetails { id: self.id }.into()).json(self.fields);
         let new = self.app.request::<FractalItem<Server>>(builder).await?;
 
         Ok(new.attributes)
@@ -203,7 +208,11 @@ pub struct UpdateServerStartup<'a> {
 impl<'a> UpdateServerStartup<'a> {
     #[doc(hidden)]
     pub fn new(app: &'a Application, id: i32) -> Self {
-        Self { app, id, fields: Default::default() }
+        Self {
+            app,
+            id,
+            fields: Default::default(),
+        }
     }
 
     /// Sets the startup command for the server, otherwise defaults to the current one.
@@ -214,9 +223,9 @@ impl<'a> UpdateServerStartup<'a> {
     }
 
     /// Sets an environment variable for the server.
-    /// 
+    ///
     /// ### Warning
-    /// 
+    ///
     /// Due to the complexity of this field, the current server environment variables **will not**
     /// be filled in by default like other update methods. You need to set every variable required
     /// by the egg/server in this request.
@@ -258,7 +267,8 @@ impl<'a> UpdateServerStartup<'a> {
             self.fields.image = server.container.image.as_str();
         }
 
-        let builder = Builder::new(Route::UpdateServerStartup { id: self.id }.into()).json(self.fields);
+        let builder =
+            Builder::new(Route::UpdateServerStartup { id: self.id }.into()).json(self.fields);
         let new = self.app.request::<FractalItem<Server>>(builder).await?;
 
         Ok(new.attributes)
