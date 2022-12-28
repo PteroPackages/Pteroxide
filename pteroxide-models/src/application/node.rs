@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::NodeRelations;
+
 /// Represents the inner API configuration of a [`NodeConfiguration`] object.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub struct APIConfiguration {
@@ -34,6 +36,10 @@ pub struct Node {
     pub allocated_resources: NodeResources,
     pub created_at: String,
     pub updated_at: Option<String>,
+    #[cfg(feature = "app-relations")]
+    #[serde(default)]
+    #[serde(skip_serializing)]
+    pub relationships: Option<NodeRelations>,
 }
 
 #[cfg(feature = "time")]
