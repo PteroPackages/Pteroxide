@@ -4,7 +4,7 @@ use serde::{
 };
 use std::fmt::{Formatter, Result as FmtResult};
 
-use super::{Server, SubUser, User};
+use super::{Allocation, Egg, Location, Nest, Node, Server, SubUser, User};
 use crate::fractal::{FractalItem, FractalList};
 
 #[derive(Deserialize)]
@@ -57,8 +57,13 @@ impl<'de> Deserialize<'de> for UserRelations {
 #[derive(Deserialize)]
 #[doc(hidden)]
 struct RawServerRelations {
+    allocations: Option<FractalList<Allocation>>,
     user: Option<FractalItem<User>>,
     subusers: Option<FractalList<SubUser>>,
+    nest: Option<FractalItem<Nest>>,
+    egg: Option<FractalItem<Egg>>,
+    location: Option<FractalItem<Location>>,
+    node: Option<FractalItem<Node>>,
 }
 
 #[doc(hidden)]
@@ -79,12 +84,32 @@ impl<'de> Visitor<'de> for ServerRelationVisitor {
         let rel = RawServerRelations::deserialize(des)?;
 
         Ok(ServerRelations {
+            allocations: match rel.allocations {
+                Some(v) => Some(v.data.iter().map(|a| a.attributes.clone()).collect()),
+                None => None,
+            },
             user: match rel.user {
                 Some(u) => Some(u.attributes),
                 None => None,
             },
             subusers: match rel.subusers {
                 Some(v) => Some(v.data.iter().map(|u| u.attributes.clone()).collect()),
+                None => None,
+            },
+            nest: match rel.nest {
+                Some(n) => Some(n.attributes),
+                None => None,
+            },
+            egg: match rel.egg {
+                Some(e) => Some(e.attributes),
+                None => None,
+            },
+            location: match rel.location {
+                Some(l) => Some(l.attributes),
+                None => None,
+            },
+            node: match rel.node {
+                Some(n) => Some(n.attributes),
                 None => None,
             },
         })
@@ -94,8 +119,13 @@ impl<'de> Visitor<'de> for ServerRelationVisitor {
 /// Represents the relationship objects for a server.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ServerRelations {
+    pub allocations: Option<Vec<Allocation>>,
     pub user: Option<User>,
     pub subusers: Option<Vec<SubUser>>,
+    pub nest: Option<Nest>,
+    pub egg: Option<Egg>,
+    pub location: Option<Location>,
+    pub node: Option<Node>,
 }
 
 impl<'de> Deserialize<'de> for ServerRelations {
