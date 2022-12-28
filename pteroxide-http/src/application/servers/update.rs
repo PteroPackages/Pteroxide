@@ -1,7 +1,8 @@
 use pteroxide_models::{application::Server, fractal::FractalItem, FeatureLimits, Limits};
 use serde::Serialize;
+use std::collections::HashMap;
 
-use crate::{routing::Application as Route, Application, Builder, Error};
+use crate::{routing::Application as Route, Application, Builder, Error, Value};
 use super::GetServer;
 
 #[derive(Debug, Default, Serialize)]
@@ -159,6 +160,11 @@ impl<'a> UpdateServerDetails<'a> {
         self
     }
 
+    /// Asynchronously executes the request and returns the updated [`Server`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
     pub async fn exec(mut self) -> Result<Server, Error> {
         let server = GetServer::new(self.app, self.id).exec().await?;
 
@@ -173,6 +179,86 @@ impl<'a> UpdateServerDetails<'a> {
         }
 
         let builder = Builder::new(Route::UpdateServerDetails { id: self.id }.into()).json(self.fields);
+        let new = self.app.request::<FractalItem<Server>>(builder).await?;
+
+        Ok(new.attributes)
+    }
+}
+
+#[derive(Debug, Default, Serialize)]
+struct UpdateServerStartupFields<'a> {
+    pub startup: &'a str,
+    pub environment: HashMap<&'a str, Value>,
+    pub egg: i32,
+    pub image: &'a str,
+}
+
+#[derive(Debug)]
+pub struct UpdateServerStartup<'a> {
+    app: &'a Application,
+    id: i32,
+    fields: UpdateServerStartupFields<'a>,
+}
+
+impl<'a> UpdateServerStartup<'a> {
+    #[doc(hidden)]
+    pub fn new(app: &'a Application, id: i32) -> Self {
+        Self { app, id, fields: Default::default() }
+    }
+
+    /// Sets the startup command for the server, otherwise defaults to the current one.
+    pub fn startup(mut self, command: &'a str) -> Self {
+        self.fields.startup = command;
+
+        self
+    }
+
+    /// Sets an environment variable for the server.
+    /// 
+    /// ### Warning
+    /// 
+    /// Due to the complexity of this field, the current server environment variables **will not**
+    /// be filled in by default like other update methods. You need to set every variable required
+    /// by the egg/server in this request.
+    pub fn env_variable(mut self, key: &'a str, value: Value) -> Self {
+        self.fields.environment.insert(key, value);
+
+        self
+    }
+
+    /// Sets the egg to use for the server, otherwise defaults to the existing one.
+    pub fn egg(mut self, id: i32) -> Self {
+        self.fields.egg = id;
+
+        self
+    }
+
+    /// Sets the docker image for the server.
+    pub fn docker_image(mut self, image: &'a str) -> Self {
+        self.fields.image = image;
+
+        self
+    }
+
+    /// Asynchronously executes the request and returns the updated [`Server`] object.
+    ///
+    /// ## Errors
+    ///
+    /// Returns an [`Error`] if the request fails or a field does not satisfy a validation rule.
+    pub async fn exec(mut self) -> Result<Server, Error> {
+        let server = GetServer::new(self.app, self.id).exec().await?;
+
+        if self.fields.startup.is_empty() {
+            self.fields.startup = server.container.startup_command.as_str();
+        }
+        if self.fields.egg == 0 {
+            self.fields.egg = server.egg;
+        }
+        if self.fields.image.is_empty() {
+            self.fields.image = server.container.image.as_str();
+        }
+
+        let builder = Builder::new(Route::UpdateServerStartup { id: self.id }.into()).json(self.fields);
         let new = self.app.request::<FractalItem<Server>>(builder).await?;
 
         Ok(new.attributes)
