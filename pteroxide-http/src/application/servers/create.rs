@@ -1,9 +1,9 @@
-use pteroxide_models::{application::Server, fractal::FractalItem, FeatureLimits, Limits};
+use pteroxide_models::{application::Server, fractal::FractalItem, FeatureLimits, Limits, Value};
 use serde::Serialize;
 use std::collections::HashMap;
 
 use crate::routing::Application as Route;
-use crate::{Application, Builder, Error, Value};
+use crate::{Application, Builder, Error};
 
 #[derive(Debug, Default, Serialize)]
 struct AllocationData {

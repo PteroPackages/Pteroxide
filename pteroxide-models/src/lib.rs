@@ -6,6 +6,9 @@ pub mod application;
 pub mod fractal;
 #[cfg(feature = "time")]
 pub mod util;
+pub mod value;
+
+pub use value::Value;
 
 /// Represents the feature limits of a server.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
