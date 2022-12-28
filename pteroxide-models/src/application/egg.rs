@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+#[cfg(feature = "app-relations")]
+use super::EggRelations;
+
 /// Represents an egg (service) object, containing all the necessary information about the service
 /// including Docker images, startup scripts, and parser configurations.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -18,6 +21,10 @@ pub struct Egg {
     pub script: EggScript,
     pub created_at: String,
     pub updated_at: Option<String>,
+    #[cfg(feature = "app-relations")]
+    #[serde(default)]
+    #[serde(skip_serializing)]
+    pub relationships: Option<EggRelations>,
 }
 
 #[cfg(feature = "time")]
