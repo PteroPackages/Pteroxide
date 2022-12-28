@@ -1,5 +1,8 @@
+pub mod location;
 pub mod node;
 pub mod server;
 pub mod user;
 
-pub use self::{node::NodeRelations, server::ServerRelations, user::UserRelations};
+pub use self::{
+    location::LocationRelations, node::NodeRelations, server::ServerRelations, user::UserRelations,
+};

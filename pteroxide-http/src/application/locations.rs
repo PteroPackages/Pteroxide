@@ -9,12 +9,39 @@ use crate::{routing::Application as Route, Application, Builder, Error};
 #[derive(Debug)]
 pub struct GetLocations<'a> {
     app: &'a Application,
+    with_nodes: bool,
+    with_servers: bool,
 }
 
 impl<'a> GetLocations<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application) -> Self {
-        Self { app }
+        Self {
+            app,
+            with_nodes: false,
+            with_servers: false,
+        }
+    }
+
+    /// Include the [`nodes`] the location contains in the location [`relationships`].
+    ///
+    /// [`nodes`]: pteroxide_models::application::Node
+    /// [`relationships`]: pteroxide_models::application::LocationRelations
+    pub fn with_nodes(mut self, value: bool) -> Self {
+        self.with_nodes = value;
+
+        self
+    }
+
+    /// Include the [`servers`] of the nodes the location contains in the location
+    /// [`relationships`].
+    ///
+    /// [`servers`]: pteroxide_models::application::Server
+    /// [`relationships`]: pteroxide_models::application::LocationRelations
+    pub fn with_servers(mut self, value: bool) -> Self {
+        self.with_servers = value;
+
+        self
     }
 
     /// Asynchronously executes the request and returns a list of [`Location`] objects.
@@ -23,10 +50,16 @@ impl<'a> GetLocations<'a> {
     ///
     /// Returns an [`Error`] if the request fails.
     pub async fn exec(&self) -> Result<Vec<Location>, Error> {
-        let res = self
-            .app
-            .request::<FractalList<Location>>(Builder::new(Route::GetLocations.into()))
-            .await?;
+        let mut builder = Builder::new(Route::GetLocations.into());
+
+        if self.with_nodes {
+            builder = builder.include("nodes");
+        }
+        if self.with_servers {
+            builder = builder.include("servers");
+        }
+
+        let res = self.app.request::<FractalList<Location>>(builder).await?;
 
         Ok(res.data.iter().map(|l| l.attributes.clone()).collect())
     }
@@ -36,21 +69,53 @@ impl<'a> GetLocations<'a> {
 pub struct GetLocation<'a> {
     app: &'a Application,
     id: i32,
+    with_nodes: bool,
+    with_servers: bool,
 }
 
 impl<'a> GetLocation<'a> {
     #[doc(hidden)]
     pub const fn new(app: &'a Application, id: i32) -> Self {
-        Self { app, id }
+        Self {
+            app,
+            id,
+            with_nodes: false,
+            with_servers: false,
+        }
+    }
+
+    /// Include the [`nodes`] the location contains in the location [`relationships`].
+    ///
+    /// [`nodes`]: pteroxide_models::application::Node
+    /// [`relationships`]: pteroxide_models::application::LocationRelations
+    pub fn with_nodes(mut self, value: bool) -> Self {
+        self.with_nodes = value;
+
+        self
+    }
+
+    /// Include the [`servers`] of the nodes the location contains in the location
+    /// [`relationships`].
+    ///
+    /// [`servers`]: pteroxide_models::application::Server
+    /// [`relationships`]: pteroxide_models::application::LocationRelations
+    pub fn with_servers(mut self, value: bool) -> Self {
+        self.with_servers = value;
+
+        self
     }
 
     pub async fn exec(&self) -> Result<Location, Error> {
-        let res = self
-            .app
-            .request::<FractalItem<Location>>(Builder::new(
-                Route::GetLocation { id: self.id }.into(),
-            ))
-            .await?;
+        let mut builder = Builder::new(Route::GetLocation { id: self.id }.into());
+
+        if self.with_nodes {
+            builder = builder.include("nodes");
+        }
+        if self.with_servers {
+            builder = builder.include("servers");
+        }
+
+        let res = self.app.request::<FractalItem<Location>>(builder).await?;
 
         Ok(res.attributes)
     }

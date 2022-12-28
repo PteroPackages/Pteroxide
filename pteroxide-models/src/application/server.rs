@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "app-relations")]
 use super::relations::ServerRelations;
-use crate::{FeatureLimits, Limits, /* Value */};
+use crate::{FeatureLimits, Limits /* Value */};
 
 /// Represents the container details for the server, such as the startup command and docker image.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
