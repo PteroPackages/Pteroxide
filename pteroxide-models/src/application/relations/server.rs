@@ -48,7 +48,7 @@ impl<'de> Visitor<'de> for RelationsVisitor {
                 None => None,
             },
             subusers: match rel.subusers {
-                Some(v) => Some(v.data.iter().map(|u| u.attributes.clone()).collect()),
+                Some(v) => Some(v.data.iter().map(|s| s.attributes.clone()).collect()),
                 None => None,
             },
             nest: match rel.nest {

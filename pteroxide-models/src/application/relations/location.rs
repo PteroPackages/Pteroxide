@@ -23,7 +23,7 @@ impl<'de> Visitor<'de> for RelationsVisitor {
     type Value = LocationRelations;
 
     fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("a map of node relationships")
+        formatter.write_str("a map of location relationships")
     }
 
     fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>

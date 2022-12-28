@@ -5,15 +5,14 @@ use serde::{
 use std::fmt::{Formatter, Result as FmtResult};
 
 use crate::{
-    application::{Allocation, Location, Server},
-    fractal::{FractalItem, FractalList},
+    application::{Egg, Server},
+    fractal::FractalList,
 };
 
 #[derive(Deserialize)]
 #[doc(hidden)]
-struct RawNodeRelations {
-    allocations: Option<FractalList<Allocation>>,
-    location: Option<FractalItem<Location>>,
+struct RawNestRelations {
+    eggs: Option<FractalList<Egg>>,
     servers: Option<FractalList<Server>>,
 }
 
@@ -21,10 +20,10 @@ struct RawNodeRelations {
 struct RelationsVisitor;
 
 impl<'de> Visitor<'de> for RelationsVisitor {
-    type Value = NodeRelations;
+    type Value = NestRelations;
 
     fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
-        formatter.write_str("a map of node relationships")
+        formatter.write_str("a map of nest relationships")
     }
 
     fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
@@ -32,15 +31,11 @@ impl<'de> Visitor<'de> for RelationsVisitor {
         A: MapAccess<'de>,
     {
         let des = MapAccessDeserializer::new(map);
-        let rel = RawNodeRelations::deserialize(des)?;
+        let rel = RawNestRelations::deserialize(des)?;
 
-        Ok(NodeRelations {
-            allocations: match rel.allocations {
-                Some(v) => Some(v.data.iter().map(|a| a.attributes.clone()).collect()),
-                None => None,
-            },
-            location: match rel.location {
-                Some(l) => Some(l.attributes),
+        Ok(NestRelations {
+            eggs: match rel.eggs {
+                Some(v) => Some(v.data.iter().map(|e| e.attributes.clone()).collect()),
                 None => None,
             },
             servers: match rel.servers {
@@ -52,13 +47,12 @@ impl<'de> Visitor<'de> for RelationsVisitor {
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct NodeRelations {
-    pub allocations: Option<Vec<Allocation>>,
-    pub location: Option<Location>,
+pub struct NestRelations {
+    pub eggs: Option<Vec<Egg>>,
     pub servers: Option<Vec<Server>>,
 }
 
-impl<'de> Deserialize<'de> for NodeRelations {
+impl<'de> Deserialize<'de> for NestRelations {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
