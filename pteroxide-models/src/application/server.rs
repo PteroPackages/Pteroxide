@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
+// use std::collections::HashMap;
 
 #[cfg(feature = "app-relations")]
 use super::relations::ServerRelations;
-use crate::{FeatureLimits, Limits};
+use crate::{FeatureLimits, Limits, /* Value */};
 
 /// Represents the container details for the server, such as the startup command and docker image.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
@@ -10,8 +11,8 @@ pub struct Container {
     pub startup_command: String,
     pub image: String,
     pub installed: i8,
-    // TODO: handle this, maybe ContainerEnv?
-    // pub environment
+    // TODO
+    // pub environment: HashMap<String, Value>,
 }
 
 /// Represents a server object. This contains general information about the server such as the
