@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "app-relations")]
 use super::NodeRelations;
 
 /// Represents the inner API configuration of a [`NodeConfiguration`] object.
