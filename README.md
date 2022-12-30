@@ -20,4 +20,4 @@ _Check the individual crate libraries for specific listed contributors._
 
 This repository is managed under the MIT license.
 
-© 2021-2022 PteroPackages
+© 2021-present PteroPackages
